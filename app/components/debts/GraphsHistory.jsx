@@ -12,7 +12,9 @@ export default function GraphsHistory({ debts, formatCurrency }) {
   });
 
   return (
-    <>
+    <div className="rounded-xl bg-zinc-900! border border-slate-600 p-4">
+      <h3 className="text-lg font-semibold">Visualiación de deudas</h3>
+      <p className="text-gray mb-6">Comparación de montos pagados vs. por pagar</p>
       <div className="h-75 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
@@ -37,6 +39,6 @@ export default function GraphsHistory({ debts, formatCurrency }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </>
+    </div>
   );
 }
