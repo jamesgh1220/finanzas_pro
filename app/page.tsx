@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Header from '@/app/components/ui/HeaderComponent';
 import Tabs from '@/app/components/ui/TabsComponent';
+import Debts from '@/app/components/ui/Debts';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -18,7 +19,7 @@ export default function Home() {
         {/* Contenido dinámico */}
         <section className="px-4">
           {activeTab === "dashboard" && <p>📊 Contenido del Dashboard</p>}
-          {activeTab === "deudas" && <p>💳 Contenido de Deudas</p>}
+          {activeTab === "deudas" && <Debts />}
           {activeTab === "ingresos" && <p>💰 Contenido de Ingresos</p>}
         </section>
       </main>
