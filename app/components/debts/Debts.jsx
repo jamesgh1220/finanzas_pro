@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Plus, TrendingDown, Trash2, Calendar, DollarSign, Calculator } from "lucide-react";
+import { Calculator } from "lucide-react";
+import HeaderDebts from '@/app/components/debts/HeaderDebts';
+import GraphsHistory from '@/app/components/debts/GraphsHistory';
+import List from '@/app/components/debts/List';
 
 export default function DeudasSection() {
   const dialogRef = useRef(null);
-  const abonoDialogRef = useRef(null);
+  const partialPaymentDialogRef = useRef(null);
   const [form, setForm] = useState({
     nombre: "",
     montoTotal: "",
     mesesEstimados: "",
   });
-  const [abonoForm, setAbonoForm] = useState({
+  const [partialPaymentForm, setPartialPaymentForm] = useState({
     monto: "",
     fecha: new Date().toISOString().split("T")[0],
     descripcion: "",
@@ -60,39 +63,37 @@ export default function DeudasSection() {
       style: "currency",
       currency: "COP",
       minimumFractionDigits: 0,
-    }).format(value)
-
-  const totalPagado = (deuda) => deuda.abonos.reduce((sum, abono) => sum + abono.monto, 0);
+    }).format(value);
 
   const handleDelete = (id) => {
     setDeudas(deudas.filter((d) => d.id !== id));
   }
 
-  const openAbonoDialog = (deuda) => {
+  const openPartialPaymentDialog = (deuda) => {
     setDeudaSeleccionadaId(deuda.id)
-    abonoDialogRef.current?.showModal()
+    partialPaymentDialogRef.current?.showModal()
   }
 
-  const closeAbonoDialog = () => {
-    abonoDialogRef.current?.close()
+  const closePartialPaymentDialog = () => {
+    partialPaymentDialogRef.current?.close()
     setDeudaSeleccionadaId(null)
-    setAbonoForm({
+    setPartialPaymentForm({
       monto: "",
       fecha: new Date().toISOString().split("T")[0],
       descripcion: "",
     })
   }
 
-  const handleAddAbono = (e) => {
+  const handleAddPartialPayment = (e) => {
     e.preventDefault();
 
     if (!deudaSeleccionadaId) return;
 
-    const nuevoAbono = {
+    const newPartialPayment = {
       id: Date.now().toString(),
-      monto: Number(abonoForm.monto),
-      fecha: abonoForm.fecha,
-      descripcion: abonoForm.descripcion || undefined,
+      monto: Number(partialPaymentForm.monto),
+      fecha: partialPaymentForm.fecha,
+      descripcion: partialPaymentForm.descripcion || undefined,
     };
     
     setDeudas((prevDeudas) =>
@@ -100,13 +101,13 @@ export default function DeudasSection() {
         deuda.id === deudaSeleccionadaId
           ? {
               ...deuda,
-              abonos: [...(deuda.abonos ?? []), nuevoAbono],
+              abonos: [...(deuda.abonos ?? []), newPartialPayment],
             }
           : deuda
       )
     );
 
-    closeAbonoDialog();
+    closePartialPaymentDialog();
   }
 
   useEffect(() => {
@@ -124,104 +125,16 @@ export default function DeudasSection() {
   return (
     <section className="space-y-6 bounceIn container mx-auto px-4 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">
-            Gestión de Deudas
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Total deudas: {formatCurrency(
-              deudas.reduce((s, d) => s + d.montoTotal, 0)
-            )}
-          </p>
-        </div>
-
-        <button onClick={openDialog} className="flex justify-center items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
-          <Plus className="h-4 w-4" />
-          Nueva deuda
-        </button>
-      </div>
-
+      <HeaderDebts debts={deudas} formatCurrency={formatCurrency} openDialog={openDialog} />
+      {/* Graficas */}
+      <GraphsHistory debts={deudas} formatCurrency={formatCurrency} />
       {/* Lista de deudas */}
-      <div className="grid gap-4 md:grid-cols-2 text-foreground! lg:grid-cols-3">
-        {deudas.map((deuda) => {
-          const pagado = totalPagado(deuda)
-          const restante = deuda.montoTotal - pagado
-
-          return (
-            <div
-              key={deuda.id}
-              className="rounded-xl bg-zinc-900! border border-slate-600 p-4"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold">
-                  {deuda.nombre}
-                </h3>
-
-                <button
-                  onClick={() => handleDelete(deuda.id)}
-                  className="text-slate-400"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="flex flex-col text-sm space-y-1">
-                <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
-                  <Calendar className="h-4 w-4" />
-                  {deuda.mesesEstimados} meses
-                </div>
-                <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
-                  <DollarSign className="h-4 w-4" />
-                  Cuota: {formatCurrency(deuda.cuotaMinima)}
-                </div>
-                <div className="flex py-4">
-                  <div className="flex-1">
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-gray">Total deuda</p>
-                      <p className="text-white! font-semibold">{formatCurrency(deuda.montoTotal)}</p>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-gray">Abonos</p>
-                      <p className="text-white! font-semibold">{deuda.abonos.length} pagos</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-y-1 p-2 rounded-xl bg-zinc-800! mb-4">
-                  <p className="text-gray">Último abono</p>
-                  <p className="text-white! font-semibold">{formatCurrency(deuda.abonos[deuda.abonos.length - 1]?.monto ?? 0)}</p>
-                  <p className="text-gray">{deuda.abonos[deuda.abonos.length - 1]?.fecha ?? ''}</p>
-                </div>
-                <button onClick={() => openAbonoDialog(deuda)} className="flex justify-center items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
-                  <Plus className="h-4 w-4" />
-                  Agregar abono
-                </button>
-                <p className="text-green-500">
-                  Pagado: {formatCurrency(pagado)}
-                </p>
-                <p className="text-red-500">
-                  Restante: {formatCurrency(restante)}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-
-        {/* Estado vacío */}
-        {deudas.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-12">
-            <TrendingDown className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              No tienes deudas registradas
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4 text-center">
-              Agrega tu primera deuda para comenzar el seguimiento
-            </p>
-          </div>
-        )}
-      </div>
+      <List
+        debts={deudas}
+        formatCurrency={formatCurrency}
+        handleDelete={handleDelete}
+        openPartialPaymentDialog={openPartialPaymentDialog}
+      />
 
       {/* DIALOG */}
       <dialog
@@ -307,11 +220,11 @@ export default function DeudasSection() {
 
       {/* ABONO DIALOG */}
       <dialog
-        ref={abonoDialogRef}
+        ref={partialPaymentDialogRef}
         className="rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 bounceIn my-auto"
         onClick={(e) => {
-          if (e.target === abonoDialogRef.current) {
-            closeAbonoDialog()
+          if (e.target === partialPaymentDialogRef.current) {
+            closePartialPaymentDialog()
           }
         }}
       >
@@ -320,15 +233,15 @@ export default function DeudasSection() {
           Registra un pago para: <b>{deudaSeleccionada?.nombre}</b>
         </p>
 
-        <form onSubmit={handleAddAbono} className="space-y-4">
+        <form onSubmit={handleAddPartialPayment} className="space-y-4">
           <div>
             <label className="text-sm">Monto del abono</label>
             <input
               type="number"
               className="w-full mt-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700"
-              value={abonoForm.monto}
+              value={partialPaymentForm.monto}
               onChange={(e) =>
-                setAbonoForm({ ...abonoForm, monto: e.target.value })
+                setPartialPaymentForm({ ...partialPaymentForm, monto: e.target.value })
               }
               required
             />
@@ -339,9 +252,9 @@ export default function DeudasSection() {
             <input
               type="date"
               className="w-full mt-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700"
-              value={abonoForm.fecha}
+              value={partialPaymentForm.fecha}
               onChange={(e) =>
-                setAbonoForm({ ...abonoForm, fecha: e.target.value })
+                setPartialPaymentForm({ ...partialPaymentForm, fecha: e.target.value })
               }
               required
             />
@@ -352,9 +265,9 @@ export default function DeudasSection() {
             <textarea
               rows={3}
               className="w-full mt-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 resize-none"
-              value={abonoForm.descripcion}
+              value={partialPaymentForm.descripcion}
               onChange={(e) =>
-                setAbonoForm({ ...abonoForm, descripcion: e.target.value })
+                setPartialPaymentForm({ ...partialPaymentForm, descripcion: e.target.value })
               }
             />
           </div>
@@ -362,7 +275,7 @@ export default function DeudasSection() {
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={closeAbonoDialog}
+              onClick={closePartialPaymentDialog}
               className="px-4 py-2 rounded border border-zinc-600"
             >
               Cancelar

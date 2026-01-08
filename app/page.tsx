@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Header from '@/app/components/ui/HeaderComponent';
 import Tabs from '@/app/components/ui/TabsComponent';
-import Debts from '@/app/components/ui/Debts';
+import Debts from '@/app/components/debts/Debts';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("dashboard");
