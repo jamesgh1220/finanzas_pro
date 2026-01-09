@@ -139,7 +139,7 @@ export default function HomeDashboard() {
     }).format(value);
   return (
     <>
-      <section className="space-y-8 container mx-auto px-4 lg:px-8">
+      <section className="bounceIn space-y-8 container mx-auto px-4 lg:px-8 mb-16">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="p-6 bg-card border border-slate-700 rounded-3xl">
             <div className="flex justify-between items-center">
@@ -244,7 +244,7 @@ export default function HomeDashboard() {
           <div className="p-6 bg-card border border-slate-700 rounded-3xl">
             <h3 className="text-xl font-semibold">Flujo de Caja mensual</h3>
             <p className="text-gray">Ingresos, gastos y dinero disponible</p>
-            <div className="h-72 w-full">
+            <div className="h-72 w-full mt-8">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={flujoCaja}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
