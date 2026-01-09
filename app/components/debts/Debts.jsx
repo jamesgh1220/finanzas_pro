@@ -144,7 +144,7 @@ export default function DeudasSection() {
             dialogRef.current.close()
           }
         }}
-        className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 my-auto"
+        className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 m-auto"
       >
         <h3 className="text-lg font-semibold mb-1 text-center">Nueva Deuda</h3>
         <p className="text-sm text-gray-400 mb-4 text-center">
@@ -221,7 +221,7 @@ export default function DeudasSection() {
       {/* ABONO DIALOG */}
       <dialog
         ref={partialPaymentDialogRef}
-        className="rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 bounceIn my-auto"
+        className="rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 bounceIn m-auto"
         onClick={(e) => {
           if (e.target === partialPaymentDialogRef.current) {
             closePartialPaymentDialog()

@@ -14,7 +14,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
           return (
             <div
               key={debt.id}
-              className="rounded-xl bg-zinc-900! border border-slate-600 p-4"
+              className="rounded-xl bg-card border border-slate-600 p-4"
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-semibold">
@@ -25,18 +25,20 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                   onClick={() => handleDelete(debt.id)}
                   className="text-slate-400 cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="size-5" />
                 </button>
               </div>
 
               <div className="flex flex-col text-sm space-y-1">
-                <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
-                  <Calendar className="h-4 w-4" />
-                  {debt.mesesEstimados} meses
-                </div>
-                <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
-                  <DollarSign className="h-4 w-4" />
-                  Cuota: {formatCurrency(debt.cuotaMinima)}
+                <div className="flex gap-x-4">
+                  <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
+                    <Calendar className="h-4 w-4" />
+                    {debt.mesesEstimados} meses
+                  </div>
+                  <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
+                    <DollarSign className="h-4 w-4" />
+                    Cuota: {formatCurrency(debt.cuotaMinima)}
+                  </div>
                 </div>
                 <div className="py-4 space-y-1">
                   <div className="text-base text-gray inline-flex justify-between w-full">
@@ -76,7 +78,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-y-1 p-2 rounded-xl bg-zinc-800! mb-4">
+                <div className="flex flex-col gap-y-1 p-3 rounded-xl bg-secondary/50 mb-4">
                   <p className="text-gray">Último abono</p>
                   <p className="text-white! font-semibold">{formatCurrency(debt.abonos[debt.abonos.length - 1]?.monto ?? 0)}</p>
                   <p className="text-gray">{debt.abonos[debt.abonos.length - 1]?.fecha ?? ''}</p>
