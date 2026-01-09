@@ -127,7 +127,7 @@ export default function DeudasSection() {
       {/* Header */}
       <HeaderDebts debts={deudas} formatCurrency={formatCurrency} openDialog={openDialog} />
       {/* Graficas */}
-      <GraphsHistory debts={deudas} formatCurrency={formatCurrency} />
+      { deudas.length > 0 &&  <GraphsHistory debts={deudas} formatCurrency={formatCurrency} />}
       {/* Lista de deudas */}
       <List
         debts={deudas}

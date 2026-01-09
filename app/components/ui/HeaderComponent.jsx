@@ -12,7 +12,7 @@ export default function Header() {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-foreground">FinanzasPro</h1>
-                <p className="text-xs text-muted-foreground">Gestión Financiera Personal</p>
+                <p className="text-xs text-foreground lg:text-sm">Gestión financiera personal</p>
               </div>
             </div>
           </div>

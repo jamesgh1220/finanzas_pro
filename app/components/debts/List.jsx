@@ -9,6 +9,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
         {debts.map((debt) => {
           const paid = totalPaid(debt);
           const remaining = debt.montoTotal - paid;
+          const percentage = Math.round((paid / debt.montoTotal) * 100);
 
           return (
             <div
@@ -22,7 +23,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
 
                 <button
                   onClick={() => handleDelete(debt.id)}
-                  className="text-slate-400"
+                  className="text-slate-400 cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -37,7 +38,31 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                   <DollarSign className="h-4 w-4" />
                   Cuota: {formatCurrency(debt.cuotaMinima)}
                 </div>
-                <div className="flex py-4">
+                <div className="py-4 space-y-1">
+                  <div className="text-base text-gray inline-flex justify-between w-full">
+                    <div>
+                      Progreso:
+                    </div>
+                    <div className="text-primary font-semibold">
+                      {percentage}%
+                    </div>
+                  </div>
+                  <div className="relative h-2 bg-primary/50 rounded-xl ml-auto w-full">
+                    <div
+                      className="absolute left-0 top-0 h-full bg-primary rounded-xl"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                  <div className="text-gray inline-flex justify-between w-full">
+                    <div>
+                      Pagado: {formatCurrency(paid)}
+                    </div>
+                    <div>
+                      Resta: {formatCurrency(remaining)}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex pb-4">
                   <div className="flex-1">
                     <div className="flex flex-col gap-y-1">
                       <p className="text-gray">Total deuda</p>
@@ -56,16 +81,10 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                   <p className="text-white! font-semibold">{formatCurrency(debt.abonos[debt.abonos.length - 1]?.monto ?? 0)}</p>
                   <p className="text-gray">{debt.abonos[debt.abonos.length - 1]?.fecha ?? ''}</p>
                 </div>
-                <button onClick={() => openPartialPaymentDialog(debt)} className="flex justify-center items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
+                <button onClick={() => openPartialPaymentDialog(debt)} className="cursor-pointer font-medium flex justify-center items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
                   <Plus className="h-4 w-4" />
                   Agregar abono
                 </button>
-                <p className="text-green-500">
-                  Pagado: {formatCurrency(paid)}
-                </p>
-                <p className="text-red-500">
-                  Restante: {formatCurrency(remaining)}
-                </p>
               </div>
             </div>
           )
