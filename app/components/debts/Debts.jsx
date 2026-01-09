@@ -46,6 +46,7 @@ export default function DeudasSection() {
 
     const nuevaDeuda = {
       id: Date.now().toString(),
+      fecha: new Date().toISOString(),
       nombre: form.nombre,
       montoTotal: Number(form.montoTotal),
       mesesEstimados: Number(form.mesesEstimados),

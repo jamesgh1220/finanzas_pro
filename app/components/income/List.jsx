@@ -5,7 +5,7 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
 
   return (
     <>
-      <div className="grid gap-4">
+      <div className="grid gap-4 lg:grid-cols-2">
         {incomes.map((income) => (
           <div
             key={income.id}

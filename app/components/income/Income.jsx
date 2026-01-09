@@ -62,7 +62,7 @@ export default function Income() {
       mes,
       anio: Number(anio),
       ingresoTotal: Number(ingresoTotal),
-      createdAt: new Date().toISOString(),
+      fecha: new Date().toISOString(),
       gastos: [],
     }
 
