@@ -1,7 +1,7 @@
 import { Calendar, Trash2, Plus } from "lucide-react";
 
 export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
-  const getTotalGastosByMes = (income) => (income.gastos ?? []).reduce((total, gasto) => total + gasto.monto, 0);
+  const getTotalIncomesByMonth = (income) => (income.gastos ?? []).reduce((total, gasto) => total + gasto.monto, 0);
 
   return (
     <>
@@ -28,10 +28,10 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
               {/* Monto */}
               <div className="text-right">
                 <button
-                  onClick={() => handleDelete(debt.id)}
+                  onClick={() => handleDelete(income.id)}
                   className="text-slate-400 cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="size-5" />
                 </button>
               </div>
             </div>
@@ -39,11 +39,13 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
               <div className="grid grid-cols-2 gap-x-4">
                 <div className="bg-secondary/50 rounded-xl p-3 space-y-1">
                   <p className="text-gray">Gastos</p>
-                  <p className="text-danger font-semibold">$ {getTotalGastosByMes(income).toLocaleString("es-CO")}</p>
+                  <p className="text-danger font-semibold">$ {getTotalIncomesByMonth(income).toLocaleString("es-CO")}</p>
+                  <p className="text-gray text-sm">{Math.round((getTotalIncomesByMonth(income) / income.ingresoTotal) * 100)}.0 %</p>
                 </div>
                 <div className="bg-secondary/50 rounded-xl p-3 space-y-1">
                   <p className="text-gray">Disponible</p>
-                  <p className="text-success font-semibold">$ {(income.ingresoTotal - getTotalGastosByMes(income)).toLocaleString("es-CO")}</p>
+                  <p className="text-success font-semibold">$ {(income.ingresoTotal - getTotalIncomesByMonth(income)).toLocaleString("es-CO")}</p>
+                  <p className="text-gray text-sm">{Math.round(((income.ingresoTotal - getTotalIncomesByMonth(income)) / income.ingresoTotal) * 100)}.0 %</p>
                 </div>
               </div>
               <div className="space-y-4 text-sm text-zinc-300">
@@ -61,7 +63,7 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
                         )}
                       </div>
                       <button
-                        onClick={() => handleDelete(debt.id)}
+                        onClick={() => handleDelete(gasto.id)}
                         className="text-gray cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                       >
                         <Trash2 className="size-5" />

@@ -5,12 +5,12 @@ import List from '@/app/components/income/List';
 import HeaderIncomes from '@/app/components/income/HeaderIncomes';
 import { Calculator } from "lucide-react";
 
-const MESES = [
+const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
-const CATEGORIAS = [
+const CATEGORIES = [
   "Arriendo",
   "Mercado",
   "Transporte",
@@ -33,7 +33,7 @@ export default function Income() {
     }
   });
   const now = new Date()
-  const [mes, setMes] = useState(MESES[now.getMonth()]);
+  const [mes, setMes] = useState(MONTHS[now.getMonth()]);
   const [anio, setAnio] = useState(now.getFullYear().toString());
   const [ingresoTotal, setIngresoTotal] = useState("");
   const addGastoRef = useRef(null);
@@ -71,7 +71,7 @@ export default function Income() {
       return updated
     })
 
-    setMes(MESES[now.getMonth()])
+    setMes(MONTHS[now.getMonth()])
     setAnio(now.getFullYear().toString())
     setIngresoTotal("")
     close()
@@ -170,7 +170,7 @@ export default function Income() {
                   onChange={(e) => setMes(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 >
-                  {MESES.map((m) => (
+                  {MONTHS.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
@@ -265,7 +265,7 @@ export default function Income() {
                 required
               >
                 <option value="">Selecciona una categoría</option>
-                {CATEGORIAS.map((c) => (
+                {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
