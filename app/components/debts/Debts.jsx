@@ -26,7 +26,7 @@ export default function DeudasSection() {
   const [deudas, setDeudas] = useState(() => {
     if (typeof window === "undefined") return [];
     try {
-      const stored = localStorage.getItem("deudas");
+      const stored = localStorage.getItem("debts");
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -111,7 +111,7 @@ export default function DeudasSection() {
   }
 
   useEffect(() => {
-    const storedDeudas = localStorage.getItem("deudas")
+    const storedDeudas = localStorage.getItem("debts")
     if (storedDeudas) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setDeudas(JSON.parse(storedDeudas));
@@ -119,8 +119,8 @@ export default function DeudasSection() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("deudas", JSON.stringify(deudas))
-  }, [deudas])
+    localStorage.setItem("debts", JSON.stringify(deudas))
+  }, [deudas]);
 
   return (
     <section className="space-y-6 bounceIn container mx-auto px-4 lg:px-8">
