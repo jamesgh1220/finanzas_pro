@@ -10,13 +10,15 @@
 :root {
   /* Base */
   --foreground: #f1edee;
-  --background: #171717;
+  --background: #100c0d;
 
   /* Brand / UI colors */
   --primary: #0f92f7;   /* Azul profesional */
   --success: #10B981;   /* Verde valores positivos */
   --danger: #EF4444;    /* Rojo alertas / deudas */
   --gray: #7d8086;
+  --card: #191516;
+  --secondary: #26292e;
 }
 
 @theme inline {
@@ -29,6 +31,8 @@
   --color-success: var(--success) !important;
   --color-danger: var(--danger) !important;
   --color-gray: var(--gray) !important;
+  --color-card: var(--card) !important;
+  --color-secondary: var(--secondary) !important;
 
   /* Fonts */
   --font-inter: "Inter", sans-serif;
