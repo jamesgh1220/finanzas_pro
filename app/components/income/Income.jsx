@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import List from '@/app/components/income/List';
 import HeaderIncomes from '@/app/components/income/HeaderIncomes';
+import List from '@/app/components/income/List';
+import GraphsHistory from '@/app/components/income/GraphsHistory';
 import { Calculator } from "lucide-react";
 
 const MONTHS = [
@@ -139,10 +140,10 @@ export default function Income() {
       <section className="space-y-6 bounceIn container mx-auto px-4 lg:px-8">
         {/* Header */}
         <HeaderIncomes openDialog={open} />
-
+        {/* GRAFICAS */}
+        {incomes.length > 0 && <GraphsHistory incomes={incomes} />}
         {/* Lista de ingresos */}
         <List incomes={incomes} openAddIncomeDialog={openAddIncomeDialog} />
-
         {/* NEW MONTH */}
         <dialog
           ref={newMonthRef}
@@ -237,7 +238,7 @@ export default function Income() {
             </div>
           </form>
         </dialog>
-
+        {/* NEW INCOME */}
         <dialog
           ref={addGastoRef}
           onClick={(e) => {
