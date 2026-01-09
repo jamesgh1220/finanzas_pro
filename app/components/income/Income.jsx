@@ -1,12 +1,24 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import List from '@/app/components/income/List';
 import HeaderIncomes from '@/app/components/income/HeaderIncomes';
 import { Calculator } from "lucide-react";
 
 const MESES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const CATEGORIAS = [
+  "Arriendo",
+  "Mercado",
+  "Transporte",
+  "Servicios",
+  "Entretenimiento",
+  "Salud",
+  "Educación",
+  "Otros",
 ];
 
 export default function Income() {
@@ -24,9 +36,17 @@ export default function Income() {
   const [mes, setMes] = useState(MESES[now.getMonth()]);
   const [anio, setAnio] = useState(now.getFullYear().toString());
   const [ingresoTotal, setIngresoTotal] = useState("");
+  const addGastoRef = useRef(null);
+  const [incomeSeleccionado, setIncomeSeleccionado] = useState(null);
+  // Form gasto
+  const [gastoForm, setGastoForm] = useState({
+    categoria: "",
+    monto: "",
+    fecha: new Date().toISOString().split("T")[0],
+    descripcion: "",
+  });
 
   const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - 2 + i);
-
 
   const open = () => newMonthRef.current?.showModal();
   const close = () => newMonthRef.current?.close();
@@ -42,6 +62,7 @@ export default function Income() {
       anio: Number(anio),
       ingresoTotal: Number(ingresoTotal),
       createdAt: new Date().toISOString(),
+      gastos: [],
     }
 
     setIncomes((prev) => {
@@ -54,6 +75,51 @@ export default function Income() {
     setAnio(now.getFullYear().toString())
     setIngresoTotal("")
     close()
+  };
+
+  const openAddIncomeDialog = (income) => {
+    setIncomeSeleccionado(income)
+    addGastoRef.current?.showModal()
+  }
+
+  const closeAddGastoDialog = () => {
+    addGastoRef.current?.close()
+    setIncomeSeleccionado(null)
+    setGastoForm({
+      categoria: "",
+      monto: "",
+      fecha: new Date().toISOString().split("T")[0],
+      descripcion: "",
+    })
+  }
+
+  const handleAddGasto = (e) => {
+    e.preventDefault()
+    if (!incomeSeleccionado) return
+
+    const nuevoGasto = {
+      id: Date.now().toString(),
+      categoria: gastoForm.categoria,
+      monto: Number(gastoForm.monto),
+      fecha: gastoForm.fecha,
+      descripcion: gastoForm.descripcion || undefined,
+    }
+
+    setIncomes((prev) => {
+      const updated = prev.map((income) =>
+        income.id === incomeSeleccionado.id
+          ? {
+              ...income,
+              gastos: [...(income.gastos ?? []), nuevoGasto],
+            }
+          : income
+      )
+
+      localStorage.setItem("incomes", JSON.stringify(updated))
+      return updated
+    })
+
+    closeAddGastoDialog()
   }
 
   useEffect(() => {
@@ -74,8 +140,10 @@ export default function Income() {
         {/* Header */}
         <HeaderIncomes openDialog={open} />
 
+        {/* Lista de ingresos */}
+        <List incomes={incomes} openAddIncomeDialog={openAddIncomeDialog} />
+
         {/* NEW MONTH */}
-        {/* DIALOG */}
         <dialog
           ref={newMonthRef}
           onClick={(e) => {
@@ -83,10 +151,10 @@ export default function Income() {
               newMonthRef.current.close()
             }
           }}
-          className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 my-auto"
+          className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 m-auto"
         >
           <h3 className="text-center text-lg font-semibold mb-1">
-            Nuevo registro rensual
+            Nuevo registro mensual
           </h3>
           <p className="text-center text-sm text-gray-400 mb-4">
             Crea un nuevo registro para gestionar los ingresos del mes
@@ -152,19 +220,112 @@ export default function Income() {
             )}
 
             {/* BOTONES */}
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex flex-col gap-2 pt-2">
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-xl bg-primary text-white"
+              >
+                Crear Mes
+              </button>
               <button
                 type="button"
                 onClick={close}
-                className="px-4 py-2 rounded border border-zinc-600"
+                className="px-4 py-2 rounded-xl border border-zinc-600 bg-black"
               >
                 Cancelar
               </button>
+            </div>
+          </form>
+        </dialog>
+
+        <dialog
+          ref={addGastoRef}
+          onClick={(e) => {
+            if (e.target === addGastoRef.current) {
+              closeAddGastoDialog()
+            }
+          }}
+          className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 m-auto"
+        >
+          <h3 className="text-lg font-semibold mb-1 text-center">Agregar Gasto</h3>
+          <p className="text-gray-400 mb-4 text-center">
+            Registra un gasto para: {incomeSeleccionado?.mes} {incomeSeleccionado?.anio}
+          </p>
+
+          <form onSubmit={handleAddGasto} className="space-y-4">
+            {/* CATEGORIA */}
+            <div>
+              <label className="text-sm">Categoría</label>
+              <select
+                value={gastoForm.categoria}
+                onChange={(e) =>
+                  setGastoForm({ ...gastoForm, categoria: e.target.value })
+                }
+                className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
+                required
+              >
+                <option value="">Selecciona una categoría</option>
+                {CATEGORIAS.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* MONTO */}
+            <div>
+              <label className="text-sm">Monto</label>
+              <input
+                type="number"
+                value={gastoForm.monto}
+                onChange={(e) =>
+                  setGastoForm({ ...gastoForm, monto: e.target.value })
+                }
+                className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
+                required
+              />
+            </div>
+
+            {/* FECHA */}
+            <div>
+              <label className="text-sm">Fecha</label>
+              <input
+                type="date"
+                value={gastoForm.fecha}
+                onChange={(e) =>
+                  setGastoForm({ ...gastoForm, fecha: e.target.value })
+                }
+                className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
+                required
+              />
+            </div>
+
+            {/* DESCRIPCIÓN */}
+            <div>
+              <label className="text-sm">Descripción (opcional)</label>
+              <textarea
+                rows="3"
+                value={gastoForm.descripcion}
+                onChange={(e) =>
+                  setGastoForm({ ...gastoForm, descripcion: e.target.value })
+                }
+                className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700 resize-none"
+              />
+            </div>
+
+            {/* BOTONES */}
+            <div className="flex flex-col gap-2 pt-2">
               <button
                 type="submit"
-                className="px-4 py-2 rounded bg-primary text-white"
+                className="px-4 py-2 rounded-xl bg-primary text-white"
               >
-                Crear Mes
+                Agregar gasto
+              </button>
+              <button
+                type="button"
+                onClick={closeAddGastoDialog}
+                className="px-4 py-2 rounded-xl border border-zinc-600 bg-black"
+              >
+                Cancelar
               </button>
             </div>
           </form>
