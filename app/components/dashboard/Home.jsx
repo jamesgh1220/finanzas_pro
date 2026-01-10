@@ -19,10 +19,10 @@ export default function HomeDashboard() {
 
   const mostRecentIncome = incomes[incomes?.length - 1 ?? 0];
   const totalIncomesActualMonth = () => {
-    if (!incomes.length || !incomes[0].gastos) return 0
+    if (!incomes.length || !incomes[0].expenses) return 0
 
-    return incomes[0].gastos.reduce(
-      (total, gasto) => total + Number(gasto.monto),
+    return incomes[0].expenses.reduce(
+      (total, expense) => total + Number(expense.mount),
       0
     )
   }
@@ -101,16 +101,16 @@ export default function HomeDashboard() {
     }
 
     return meses.map(mes => {
-      const totalGastos = mes.gastos.reduce(
-        (acc, gasto) => acc + gasto.monto,
+      const totalIncome = mes.expenses.reduce(
+        (acc, expense) => acc + expense.mount,
         0
       )
 
       return {
-        mes: abreviacionMes[mes.mes] || mes.mes,
-        ingresos: mes.ingresoTotal,
-        gastos: totalGastos,
-        disponible: mes.ingresoTotal - totalGastos,
+        mes: abreviacionMes[mes.month] || mes.month,
+        ingresos: mes.totalIncomes,
+        gastos: totalIncome,
+        disponible: mes.totalIncomes - totalIncome,
       }
     })
   }
@@ -164,8 +164,8 @@ export default function HomeDashboard() {
                 <TrendingUp className="h-5 w-5 text-success" />
               </div>
             </div>
-            <h3 className="font-bold text-2xl mt-6">$ {mostRecentIncome?.ingresoTotal.toLocaleString("es-CO") ?? 0}</h3>
-            <h3 className="text-success">{mostRecentIncome?.mes} {mostRecentIncome?.anio}</h3>
+            <h3 className="font-bold text-2xl mt-6">$ {mostRecentIncome?.totalIncomes.toLocaleString("es-CO") ?? 0}</h3>
+            <h3 className="text-success">{mostRecentIncome?.month} {mostRecentIncome?.year}</h3>
           </div>
           <div className="p-6 bg-card border border-slate-700 rounded-3xl">
             <div className="flex justify-between items-center">
@@ -175,11 +175,11 @@ export default function HomeDashboard() {
               </div>
             </div>
             <h3 className="font-bold text-2xl mt-6">$ {totalIncomesActualMonth().toLocaleString("es-CO")}</h3>
-            {incomes?.length > 0 && <p className="text-gray">{Math.round((totalIncomesActualMonth() / mostRecentIncome?.ingresoTotal) * 100)}.0 % del ingreso</p>}
+            {incomes?.length > 0 && <p className="text-gray">{Math.round((totalIncomesActualMonth() / mostRecentIncome?.totalIncomes) * 100)}.0 % del ingreso</p>}
             {incomes?.length > 0 && <div className="relative h-2 bg-primary/50 rounded-xl ml-auto w-full mt-4">
               <div
                 className="absolute left-0 top-0 h-full bg-primary rounded-xl"
-                style={{ width: `${Math.round((totalIncomesActualMonth() / mostRecentIncome?.ingresoTotal) * 100)}%` }}
+                style={{ width: `${Math.round((totalIncomesActualMonth() / mostRecentIncome?.totalIncomes) * 100)}%` }}
               />
             </div>}
           </div>
@@ -190,7 +190,7 @@ export default function HomeDashboard() {
                 <DollarSign className="h-5 w-5 text-success" />
               </div>
             </div>
-            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.ingresoTotal ?? 0 - totalIncomesActualMonth() ?? 0).toLocaleString("es-CO") }</h3>
+            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.totalIncomes - totalIncomesActualMonth()).toLocaleString("es-CO") }</h3>
             {incomes?.length > 0 && <p className="text-gray">Después de gastos</p>}
           </div>
         </div>

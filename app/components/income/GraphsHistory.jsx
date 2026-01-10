@@ -1,31 +1,21 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-
-const CATEGORIES_COLORS = {
-  Arriendo: "#60A5FA",
-  Mercado: "#10B981",
-  Transporte: "#F59E0B",
-  Servicios: "#8B5CF6",
-  Entretenimiento: "#EC4899",
-  Salud: "#14B8A6",
-  Educación: "#F97316",
-  Otros: "#6B7280",
-}
+import { CATEGORIES_COLORS } from '@/app/resources/constants';
 
 export default function GraphsHistory({ incomes }) {
   // Datos para gráfica de distribución de gastos (mes más reciente)
   const mostRecent = incomes[incomes?.length - 1 ?? 0];
-  const incomesPerCategorie = mostRecent?.gastos.reduce(
+  const incomesPerCategorie = mostRecent?.expenses.reduce(
     (acc, income) => {
-      acc[income.categoria] = (acc[income.categoria] || 0) + income.monto
+      acc[income.categorie] = (acc[income.categorie] || 0) + income.mount
       return acc
     },
     {},
   )
 
   const pieChartData = incomesPerCategorie
-    ? Object.entries(incomesPerCategorie).map(([categorie, monto]) => ({
+    ? Object.entries(incomesPerCategorie).map(([categorie, mount]) => ({
         name: categorie,
-        value: monto,
+        value: mount,
         color: CATEGORIES_COLORS[categorie] || CATEGORIES_COLORS["Otros"],
       }))
     : []
@@ -34,12 +24,12 @@ export default function GraphsHistory({ incomes }) {
   const enablePerMonth = incomes
     .slice(0, 6)
     .reverse()
-    .map((mes) => {
-      const totalIncomes = mes.gastos.reduce((sum, income) => sum + income.monto, 0)
+    .map((month) => {
+      const totalIncome = month.expenses.reduce((sum, income) => sum + income.mount, 0)
       return {
-        mes: `${mes.mes.substring(0, 3)} ${mes.anio}`,
-        disponible: mes.ingresoTotal - totalIncomes,
-        gastos: totalIncomes,
+        month: `${month.month.substring(0, 3)} ${month.year}`,
+        enable: month.totalIncomes - totalIncome,
+        expenses: totalIncome,
       }
     })
 
@@ -58,7 +48,7 @@ export default function GraphsHistory({ incomes }) {
           {pieChartData.length > 0 && (
             <div className="bg-card rounded-xl p-4 border border-slate-600">
               <h3 className="font-semibold">Distribución de gastos</h3>
-              <p className="text-gray mb-6">{mostRecent.mes} {mostRecent.anio}</p>
+              <p className="text-gray mb-6">{mostRecent.month} {mostRecent.year}</p>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -98,7 +88,7 @@ export default function GraphsHistory({ incomes }) {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={enablePerMonth}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="mes" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
+                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
                   <YAxis
                     stroke="rgba(255,255,255,0.5)"
                     tick={{ fill: "rgba(255,255,255,0.7)" }}
@@ -112,7 +102,7 @@ export default function GraphsHistory({ incomes }) {
                     }}
                     formatter={(value) => formatCurrency(value)}
                   />
-                  <Bar dataKey="disponible" fill="#10B981" name="Disponible" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="enable" fill="#10B981" name="Disponible" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

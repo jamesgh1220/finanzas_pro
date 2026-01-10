@@ -5,26 +5,14 @@ import HeaderIncomes from '@/app/components/income/HeaderIncomes';
 import List from '@/app/components/income/List';
 import GraphsHistory from '@/app/components/income/GraphsHistory';
 import { Calculator } from "lucide-react";
-
-const MONTHS = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-];
-const QUINCENAL = MONTHS.flatMap(mes => [`${mes}-1`, `${mes}-2`]);
-
-const CATEGORIES = [
-  "Arriendo",
-  "Mercado",
-  "Transporte",
-  "Servicios",
-  "Entretenimiento",
-  "Salud",
-  "Educación",
-  "Otros",
-];
+import { MONTHS, QUINCENAL, CATEGORIES_INCOMES } from '@/app/resources/constants';
 
 export default function Income() {
   const newMonthRef = useRef(null);
+  const addGastoRef = useRef(null);
+  const open = () => newMonthRef.current?.showModal();
+  const close = () => newMonthRef.current?.close();
+
   const [incomes, setIncomes] = useState(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -34,87 +22,84 @@ export default function Income() {
       return [];
     }
   });
-  const [periodo, setPeriodo] = useState("mensual");
-  const mesesDisponibles = periodo === "mensual" ? MONTHS : QUINCENAL;
-  const now = new Date()
-  const [mes, setMes] = useState(mesesDisponibles[0]);
-  const [anio, setAnio] = useState(now.getFullYear().toString());
-  const [ingresoTotal, setIngresoTotal] = useState("");
-  const addGastoRef = useRef(null);
-  const [incomeSeleccionado, setIncomeSeleccionado] = useState(null);
-  // Form gasto
-  const [gastoForm, setGastoForm] = useState({
-    categoria: "",
-    monto: "",
-    fecha: new Date().toISOString().split("T")[0],
-    descripcion: "",
+  const [expenseForm, setExpenseForm] = useState({
+    categorie: "",
+    mount: "",
+    date: new Date().toISOString().split("T")[0],
+    description: "",
   });
 
+  const now = new Date();
   const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - 2 + i);
+  
+  const [mode, setMode] = useState("mensual");
+  const enabledMonths = mode === "mensual" ? MONTHS : QUINCENAL;
+  const [month, setMonth] = useState(enabledMonths[0]);
+  const [year, setYear] = useState(now.getFullYear().toString());
+  const [totalIncomes, setIngresoTotal] = useState("");
+  const [selectedIncome, setSelectedIncome] = useState(null);
 
-  const open = () => newMonthRef.current?.showModal();
-  const close = () => newMonthRef.current?.close();
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (!mes || !anio || !ingresoTotal) return
+    if (!month || !year || !totalIncomes) return
 
-    const nuevoIngreso = {
+    const newIncome = {
       id: Date.now().toString(),
-      mes,
-      anio: Number(anio),
-      ingresoTotal: Number(ingresoTotal),
-      fecha: new Date().toISOString(),
-      gastos: [],
+      month,
+      year: Number(year),
+      totalIncomes: Number(totalIncomes),
+      date: new Date().toISOString(),
+      expenses: [],
     };
 
     setIncomes((prev) => {
-      const updated = [...prev, nuevoIngreso];
+      const updated = [...prev, newIncome];
       localStorage.setItem("incomes", JSON.stringify(updated));
       return updated;
     })
 
-    setMes(mesesDisponibles[0]);
-    setAnio(now.getFullYear().toString());
+    setMonth(enabledMonths[0]);
+    setYear(now.getFullYear().toString());
     setIngresoTotal("");
     close();
   };
 
   const openAddIncomeDialog = (income) => {
-    setIncomeSeleccionado(income)
+    setSelectedIncome(income)
     addGastoRef.current?.showModal()
   }
 
   const closeAddGastoDialog = () => {
     addGastoRef.current?.close()
-    setIncomeSeleccionado(null)
-    setGastoForm({
-      categoria: "",
-      monto: "",
-      fecha: new Date().toISOString().split("T")[0],
-      descripcion: "",
+    setSelectedIncome(null)
+    setExpenseForm({
+      categorie: "",
+      mount: "",
+      date: new Date().toISOString().split("T")[0],
+      description: "",
     })
   }
 
   const handleAddGasto = (e) => {
     e.preventDefault()
-    if (!incomeSeleccionado) return
+    if (!selectedIncome) return
 
-    const nuevoGasto = {
+    const newExpense = {
       id: Date.now().toString(),
-      categoria: gastoForm.categoria,
-      monto: Number(gastoForm.monto),
-      fecha: gastoForm.fecha,
-      descripcion: gastoForm.descripcion || undefined,
+      categorie: expenseForm.categorie,
+      mount: Number(expenseForm.mount),
+      date: expenseForm.date,
+      description: expenseForm.description || undefined,
     }
 
     setIncomes((prev) => {
       const updated = prev.map((income) =>
-        income.id === incomeSeleccionado.id
+        income.id === selectedIncome.id
           ? {
               ...income,
-              gastos: [...(income.gastos ?? []), nuevoGasto],
+              expenses: [...(income.expenses ?? []), newExpense],
             }
           : income
       )
@@ -170,9 +155,9 @@ export default function Income() {
               <div>
                 <label className="text-sm">Modo</label>
                 <select
-                  value={periodo}
+                  value={mode}
                   className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
-                  onChange={e => setPeriodo(e.target.value)}
+                  onChange={e => setMode(e.target.value)}
                 >
                   <option value="mensual">Mensual</option>
                   <option value="quincenal">Quincenal</option>
@@ -181,11 +166,11 @@ export default function Income() {
               <div>
                 <label className="text-sm">Mes</label>
                 <select
-                  value={mes}
-                  onChange={(e) => setMes(e.target.value)}
+                  value={month}
+                  onChange={(e) => setMonth(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 >
-                  {mesesDisponibles.map((m) => (
+                  {enabledMonths.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
@@ -194,8 +179,8 @@ export default function Income() {
               <div>
                 <label className="text-sm">Año</label>
                 <select
-                  value={anio}
-                  onChange={(e) => setAnio(e.target.value)}
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 >
                   {years.map((y) => (
@@ -209,7 +194,7 @@ export default function Income() {
                 <input
                   type="number"
                   placeholder="5000000"
-                  value={ingresoTotal}
+                  value={totalIncomes}
                   onChange={(e) => setIngresoTotal(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                   required
@@ -221,14 +206,14 @@ export default function Income() {
             </div>
 
             {/* RESUMEN */}
-            {ingresoTotal && (
+            {totalIncomes && (
               <div className="p-3 rounded bg-primary/10">
                 <div className="flex items-center gap-2 text-primary">
                   <Calculator className="h-4 w-4" />
                   Ingreso registrado
                 </div>
                 <p className="text-xl font-bold">
-                  ${Number(ingresoTotal).toLocaleString("es-CO")}
+                  ${Number(totalIncomes).toLocaleString("es-CO")}
                 </p>
               </div>
             )}
@@ -256,14 +241,14 @@ export default function Income() {
           ref={addGastoRef}
           onClick={(e) => {
             if (e.target === addGastoRef.current) {
-              closeAddGastoDialog()
+              closeAddGastoDialog();
             }
           }}
           className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 m-auto"
         >
           <h3 className="text-lg font-semibold mb-1 text-center">Agregar Gasto</h3>
           <p className="text-gray-400 mb-4 text-center">
-            Registra un gasto para: {incomeSeleccionado?.mes} {incomeSeleccionado?.anio}
+            Registra un gasto para: {selectedIncome?.month} {selectedIncome?.year}
           </p>
 
           <form onSubmit={handleAddGasto} className="space-y-4">
@@ -271,15 +256,15 @@ export default function Income() {
             <div>
               <label className="text-sm">Categoría</label>
               <select
-                value={gastoForm.categoria}
+                value={expenseForm.categorie}
                 onChange={(e) =>
-                  setGastoForm({ ...gastoForm, categoria: e.target.value })
+                  setExpenseForm({ ...expenseForm, categorie: e.target.value })
                 }
                 className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 required
               >
                 <option value="">Selecciona una categoría</option>
-                {CATEGORIES.map((c) => (
+                {CATEGORIES_INCOMES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -290,9 +275,9 @@ export default function Income() {
               <label className="text-sm">Monto</label>
               <input
                 type="number"
-                value={gastoForm.monto}
+                value={expenseForm.mount}
                 onChange={(e) =>
-                  setGastoForm({ ...gastoForm, monto: e.target.value })
+                  setExpenseForm({ ...expenseForm, mount: e.target.value })
                 }
                 className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 required
@@ -304,9 +289,9 @@ export default function Income() {
               <label className="text-sm">Fecha</label>
               <input
                 type="date"
-                value={gastoForm.fecha}
+                value={expenseForm.date}
                 onChange={(e) =>
-                  setGastoForm({ ...gastoForm, fecha: e.target.value })
+                  setExpenseForm({ ...expenseForm, date: e.target.value })
                 }
                 className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 required
@@ -318,9 +303,9 @@ export default function Income() {
               <label className="text-sm">Descripción (opcional)</label>
               <textarea
                 rows="3"
-                value={gastoForm.descripcion}
+                value={expenseForm.description}
                 onChange={(e) =>
-                  setGastoForm({ ...gastoForm, descripcion: e.target.value })
+                  setExpenseForm({ ...expenseForm, description: e.target.value })
                 }
                 className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700 resize-none"
               />

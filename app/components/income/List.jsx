@@ -1,7 +1,7 @@
 import { Calendar, Trash2, Plus } from "lucide-react";
 
 export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
-  const getTotalIncomesByMonth = (income) => (income.gastos ?? []).reduce((total, gasto) => total + gasto.monto, 0);
+  const getTotalIncomesByMonth = (income) => (income.expenses ?? []).reduce((total, income) => total + income.mount, 0);
 
   return (
     <>
@@ -17,11 +17,11 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
                 <div className="flex items-center gap-x-2">
                   <Calendar className="size-5 text-primary" />
                   <h3 className="text-lg font-semibold text-white">
-                    {income.mes} {income.anio}
+                    {income.month} {income.year}
                   </h3>
                 </div>
                 <p className="text-sm text-zinc-400">
-                  Ingreso: ${income.ingresoTotal.toLocaleString("es-CO")}
+                  Ingreso: ${income.totalIncomes.toLocaleString("es-CO")}
                 </p>
               </div>
 
@@ -40,26 +40,26 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
                 <div className="bg-secondary/50 rounded-xl p-3 space-y-1">
                   <p className="text-gray">Gastos</p>
                   <p className="text-danger font-semibold">$ {getTotalIncomesByMonth(income).toLocaleString("es-CO")}</p>
-                  <p className="text-gray text-sm">{Math.round((getTotalIncomesByMonth(income) / income.ingresoTotal) * 100)}.0 %</p>
+                  <p className="text-gray text-sm">{Math.round((getTotalIncomesByMonth(income) / income.totalIncomes) * 100)}.0 %</p>
                 </div>
                 <div className="bg-secondary/50 rounded-xl p-3 space-y-1">
                   <p className="text-gray">Disponible</p>
-                  <p className="text-success font-semibold">$ {(income.ingresoTotal - getTotalIncomesByMonth(income)).toLocaleString("es-CO")}</p>
-                  <p className="text-gray text-sm">{Math.round(((income.ingresoTotal - getTotalIncomesByMonth(income)) / income.ingresoTotal) * 100)}.0 %</p>
+                  <p className="text-success font-semibold">$ {(income.totalIncomes - getTotalIncomesByMonth(income)).toLocaleString("es-CO")}</p>
+                  <p className="text-gray text-sm">{Math.round(((income.totalIncomes - getTotalIncomesByMonth(income)) / income.totalIncomes) * 100)}.0 %</p>
                 </div>
               </div>
               <div className="space-y-4 text-sm text-zinc-300">
                 <span className="font-semibold text-base">Detalle de gastos</span>
-                {income.gastos?.length > 0 ? (
-                  income.gastos.map((gasto) => (
+                {income.expenses?.length > 0 ? (
+                  income.expenses.map((gasto) => (
                     <div
                       key={gasto.id}
                       className="flex justify-between bg-secondary/50 p-4 rounded-xl mt-1"
                     >
                       <div>
-                        <p className="font-semibold">{gasto.categoria} - ${gasto.monto.toLocaleString("es-CO")}</p>
-                        {gasto.descripcion && (
-                          <p className="text-sm text-zinc-400">{gasto.descripcion}</p>
+                        <p className="font-semibold">{gasto.categorie} - ${gasto.mount.toLocaleString("es-CO")}</p>
+                        {gasto.description && (
+                          <p className="text-sm text-zinc-400">{gasto.description}</p>
                         )}
                       </div>
                       <button
