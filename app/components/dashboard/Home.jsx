@@ -312,7 +312,7 @@ export default function HomeDashboard() {
                 <div className="flex font-semibold mt-8">
                   <div>
                     <p className="text-base leading-3">{debt.name}</p>
-                    <span className="text-sm text-gray font-normal">Cuota mínima: $ {Math.round(debt.minimumFee.toLocaleString("es-CO"))} / mes</span>
+                    <span className="text-sm text-gray font-normal">Cuota mínima: $ {Math.round(debt.minimumFee).toLocaleString("es-CO")} / mes</span>
                   </div>
                   <div className="ml-auto">
                     <p className="text-primary">{percentage}.0 %</p>
