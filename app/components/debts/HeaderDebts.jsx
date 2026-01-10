@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 
 export default function HeaderDebts({ debts, formatCurrency, openDialog }) {
-  const totalDebts = debts?.reduce((sum, debt) => sum + debt.montoTotal, 0);
+  const totalDebts = debts?.reduce((sum, debt) => sum + debt.totalMount, 0);
    const totalDebtsPaid = debts?.reduce(
     (sum, debt) => sum + debt.partialPayments.reduce((partialSum, partial) => partialSum + partial.mount, 0),
     0,
