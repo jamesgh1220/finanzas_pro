@@ -41,8 +41,8 @@
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ededed; /* Fondo oscuro elegante */
-    --foreground: #1A1A1A;
+    --background: #100c0d; /* Fondo oscuro elegante */
+    --foreground: #f1edee;
   }
 }
 
