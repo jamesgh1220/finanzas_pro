@@ -193,7 +193,6 @@ export default function HomeDashboard() {
               </div>
             </div>
             <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.totalIncomes ?? 0 - totalIncomesActualMonth()).toLocaleString("es-CO") }</h3>
-            {mostRecentIncome?.totalIncomes}
             {incomes?.length > 0 && <p className="text-gray">Después de gastos</p>}
           </div>
         </div>
