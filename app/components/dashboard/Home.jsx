@@ -39,7 +39,7 @@ export default function HomeDashboard() {
       return total + abonosSum
     }, 0);
 
-  const generarProgresoHistorico = (deudas) => {
+  const buildHistoryProgress = (deudas) => {
     const mesesMap = {}
     const nombresMes = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
@@ -82,10 +82,10 @@ export default function HomeDashboard() {
       })
   }
 
-  const progresoHistorico = generarProgresoHistorico(debts);
+  const historyProgress = buildHistoryProgress(debts);
 
-  const generarFlujoCaja = (meses) => {
-    const abreviacionMes = {
+  const buildCashFlow = (incomes) => {
+    const monthAbbreviaton = {
       Enero: "Ene",
       Febrero: "Feb",
       Marzo: "Mar",
@@ -100,22 +100,22 @@ export default function HomeDashboard() {
       Diciembre: "Dic",
     }
 
-    return meses.map(mes => {
-      const totalIncome = mes.expenses.reduce(
+    return incomes.map(month => {
+      const totalIncome = month.expenses.reduce(
         (acc, expense) => acc + expense.mount,
         0
       )
 
       return {
-        mes: abreviacionMes[mes.month] || mes.month,
-        ingresos: mes.totalIncomes,
+        mes: monthAbbreviaton[month.month] || month.month,
+        ingresos: month.totalIncomes,
         gastos: totalIncome,
-        disponible: mes.totalIncomes - totalIncome,
+        disponible: month.totalIncomes - totalIncome,
       }
     })
   }
 
-  const flujoCaja = generarFlujoCaja(incomes);
+  const cashFlow = buildCashFlow(incomes);
 
   useEffect(() => {
     const storedDebts = localStorage.getItem("debts")
@@ -203,7 +203,7 @@ export default function HomeDashboard() {
             <p className="text-gray">Evolución de pagos</p>
             <div className="h-72 w-full mt-8">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={progresoHistorico}>
+                <AreaChart data={historyProgress}>
                   <defs>
                     <linearGradient id="colorPagado" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
@@ -246,7 +246,7 @@ export default function HomeDashboard() {
             <p className="text-gray">Ingresos, gastos y dinero disponible</p>
             <div className="h-72 w-full mt-8">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={flujoCaja}>
+                <LineChart data={cashFlow}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="mes" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
                   <YAxis

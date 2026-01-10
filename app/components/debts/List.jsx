@@ -5,7 +5,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 text-foreground! lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 text-foreground!">
         {debts.map((debt) => {
           const paid = totalPaid(debt);
           const remaining = debt.montoTotal - paid;
