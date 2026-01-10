@@ -19,12 +19,12 @@ export default function HomeDashboard() {
 
   const mostRecentIncome = incomes[incomes?.length - 1 ?? 0];
   const totalIncomesActualMonth = () => {
-    if (!incomes.length || !incomes[0].expenses) return 0
+    if (!incomes.length || !incomes[0].expenses) return 0;
 
     return incomes[0].expenses.reduce(
-      (total, expense) => total + Number(expense.mount),
+      (total, expense) => total + Number(Math.round(expense.mount)),
       0
-    )
+    );
   }
 
   const getTotalDebts = (debts = []) => debts.reduce((total, debt) => total + (debt.totalMount || 0), 0);
@@ -192,7 +192,8 @@ export default function HomeDashboard() {
                 <DollarSign className="h-5 w-5 text-success" />
               </div>
             </div>
-            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.totalIncomes - totalIncomesActualMonth()).toLocaleString("es-CO") }</h3>
+            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.totalIncomes ?? 0 - totalIncomesActualMonth()).toLocaleString("es-CO") }</h3>
+            {mostRecentIncome?.totalIncomes}
             {incomes?.length > 0 && <p className="text-gray">Después de gastos</p>}
           </div>
         </div>
@@ -312,7 +313,7 @@ export default function HomeDashboard() {
                 <div className="flex font-semibold mt-8">
                   <div>
                     <p className="text-base leading-3">{debt.name}</p>
-                    <span className="text-sm text-gray font-normal">Cuota mínima: $ {debt.minimumFee.toLocaleString("es-CO")} / mes</span>
+                    <span className="text-sm text-gray font-normal">Cuota mínima: $ {Math.round(debt.minimumFee.toLocaleString("es-CO"))} / mes</span>
                   </div>
                   <div className="ml-auto">
                     <p className="text-primary">{percentage}.0 %</p>
