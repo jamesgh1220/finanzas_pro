@@ -94,7 +94,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
 
         {/* Estado vacío */}
         {debts.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-12">
+          <div className="col-span-full flex flex-col bg-card items-center justify-center rounded-xl border border-dashed border-border py-12 w-96 mx-auto">
             <TrendingDown className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">
               No tienes deudas registradas

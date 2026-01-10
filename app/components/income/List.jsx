@@ -81,10 +81,10 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
             </div>
           </div>
         ))}
-
-        {/* Estado vacío */}
+      </div>
+      {/* Estado vacío */}
         {incomes.length === 0 && (
-          <div className="rounded-xl border border-dashed border-zinc-700 bg-zinc-900 p-8 text-center">
+          <div className="rounded-xl border border-dashed border-zinc-700 bg-card p-8 text-center w-fit mx-auto">
             <div className="mb-4 text-zinc-500 text-4xl">📊</div>
             <h3 className="text-lg font-semibold text-white mb-2">
               No hay ingresos registrados
@@ -94,7 +94,6 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
             </p>
           </div>
         )}
-      </div>
     </>
   );
 }

@@ -164,7 +164,7 @@ export default function HomeDashboard() {
                 <TrendingUp className="h-5 w-5 text-success" />
               </div>
             </div>
-            <h3 className="font-bold text-2xl mt-6">$ {mostRecentIncome?.ingresoTotal.toLocaleString("es-CO")}</h3>
+            <h3 className="font-bold text-2xl mt-6">$ {mostRecentIncome?.ingresoTotal.toLocaleString("es-CO") ?? 0}</h3>
             <h3 className="text-success">{mostRecentIncome?.mes} {mostRecentIncome?.anio}</h3>
           </div>
           <div className="p-6 bg-card border border-slate-700 rounded-3xl">
@@ -190,7 +190,7 @@ export default function HomeDashboard() {
                 <DollarSign className="h-5 w-5 text-success" />
               </div>
             </div>
-            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.ingresoTotal - totalIncomesActualMonth()).toLocaleString("es-CO") }</h3>
+            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.ingresoTotal ?? 0 - totalIncomesActualMonth() ?? 0).toLocaleString("es-CO") }</h3>
             {incomes?.length > 0 && <p className="text-gray">Después de gastos</p>}
           </div>
         </div>
@@ -242,7 +242,7 @@ export default function HomeDashboard() {
 
           {/* Gráfica de flujo de caja */}
           <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <h3 className="text-xl font-semibold">Flujo de Caja mensual</h3>
+            <h3 className="text-xl font-semibold">Flujo de caja mensual</h3>
             <p className="text-gray">Ingresos, gastos y dinero disponible</p>
             <div className="h-72 w-full mt-8">
               <ResponsiveContainer width="100%" height="100%">

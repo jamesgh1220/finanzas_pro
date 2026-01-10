@@ -10,6 +10,7 @@ const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
+const QUINCENAL = MONTHS.flatMap(mes => [`${mes}-1`, `${mes}-2`]);
 
 const CATEGORIES = [
   "Arriendo",
@@ -33,8 +34,10 @@ export default function Income() {
       return [];
     }
   });
+  const [periodo, setPeriodo] = useState("mensual");
+  const mesesDisponibles = periodo === "mensual" ? MONTHS : QUINCENAL;
   const now = new Date()
-  const [mes, setMes] = useState(MONTHS[now.getMonth()]);
+  const [mes, setMes] = useState(mesesDisponibles[0]);
   const [anio, setAnio] = useState(now.getFullYear().toString());
   const [ingresoTotal, setIngresoTotal] = useState("");
   const addGastoRef = useRef(null);
@@ -64,18 +67,18 @@ export default function Income() {
       ingresoTotal: Number(ingresoTotal),
       fecha: new Date().toISOString(),
       gastos: [],
-    }
+    };
 
     setIncomes((prev) => {
-      const updated = [...prev, nuevoIngreso]
-      localStorage.setItem("incomes", JSON.stringify(updated))
-      return updated
+      const updated = [...prev, nuevoIngreso];
+      localStorage.setItem("incomes", JSON.stringify(updated));
+      return updated;
     })
 
-    setMes(MONTHS[now.getMonth()])
-    setAnio(now.getFullYear().toString())
-    setIngresoTotal("")
-    close()
+    setMes(mesesDisponibles[0]);
+    setAnio(now.getFullYear().toString());
+    setIngresoTotal("");
+    close();
   };
 
   const openAddIncomeDialog = (income) => {
@@ -155,15 +158,26 @@ export default function Income() {
           className="bounceIn rounded-xl p-6 bg-zinc-900 text-white w-full max-w-md backdrop:bg-black/60 m-auto"
         >
           <h3 className="text-center text-lg font-semibold mb-1">
-            Nuevo registro mensual
+            Nuevo ingreso
           </h3>
           <p className="text-center text-sm text-gray-400 mb-4">
-            Crea un nuevo registro para gestionar los ingresos del mes
+            Crea un nuevo registro para gestionar los ingresos
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* MES / AÑO */}
             <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm">Modo</label>
+                <select
+                  value={periodo}
+                  className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
+                  onChange={e => setPeriodo(e.target.value)}
+                >
+                  <option value="mensual">Mensual</option>
+                  <option value="quincenal">Quincenal</option>
+                </select>
+              </div>
               <div>
                 <label className="text-sm">Mes</label>
                 <select
@@ -171,7 +185,7 @@ export default function Income() {
                   onChange={(e) => setMes(e.target.value)}
                   className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
                 >
-                  {MONTHS.map((m) => (
+                  {mesesDisponibles.map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
@@ -189,22 +203,21 @@ export default function Income() {
                   ))}
                 </select>
               </div>
-            </div>
-
-            {/* INGRESO */}
-            <div>
-              <label className="text-sm">Ingreso total del mes</label>
-              <input
-                type="number"
-                placeholder="5000000"
-                value={ingresoTotal}
-                onChange={(e) => setIngresoTotal(e.target.value)}
-                className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
-                required
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Total de ingresos que recibirás este mes
-              </p>
+              {/* INGRESO */}
+              <div>
+                <label className="text-sm">Ingreso total del mes</label>
+                <input
+                  type="number"
+                  placeholder="5000000"
+                  value={ingresoTotal}
+                  onChange={(e) => setIngresoTotal(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 rounded bg-black border border-zinc-700"
+                  required
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Total de ingresos que recibirás este mes
+                </p>
+              </div>
             </div>
 
             {/* RESUMEN */}
@@ -226,7 +239,7 @@ export default function Income() {
                 type="submit"
                 className="px-4 py-2 rounded-xl bg-primary text-white"
               >
-                Crear Mes
+                Crear ingreso
               </button>
               <button
                 type="button"
