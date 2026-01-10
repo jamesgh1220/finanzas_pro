@@ -1,15 +1,15 @@
 import { Plus, TrendingDown, Trash2, Calendar, DollarSign } from "lucide-react";
 
 export default function List({ debts, formatCurrency, handleDelete, openPartialPaymentDialog }) {
-  const totalPaid = (debt) => debt.abonos.reduce((sum, abono) => sum + abono.monto, 0);
+  const totalPaid = (debt) => debt.partialPayments.reduce((sum, partial) => sum + partial.mount, 0);
 
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 text-foreground!">
         {debts.map((debt) => {
           const paid = totalPaid(debt);
-          const remaining = debt.montoTotal - paid;
-          const percentage = Math.round((paid / debt.montoTotal) * 100);
+          const remaining = debt.totalMount - paid;
+          const percentage = Math.round((paid / debt.totalMount) * 100);
 
           return (
             <div
@@ -18,7 +18,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-semibold">
-                  {debt.nombre}
+                  {debt.name}
                 </h3>
 
                 <button
@@ -33,11 +33,11 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                 <div className="flex gap-x-4">
                   <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
                     <Calendar className="h-4 w-4" />
-                    {debt.mesesEstimados} meses
+                    {debt.estimateMonths} meses
                   </div>
                   <div className="inline-flex items-center justify-center gap-x-2 border border-slate-600 px-2 py-1 rounded-lg w-fit">
                     <DollarSign className="h-4 w-4" />
-                    Cuota: {formatCurrency(debt.cuotaMinima)}
+                    Cuota: {formatCurrency(debt.minimumFee)}
                   </div>
                 </div>
                 <div className="py-4 space-y-1">
@@ -68,20 +68,20 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                   <div className="flex-1">
                     <div className="flex flex-col gap-y-1">
                       <p className="text-gray">Total deuda</p>
-                      <p className="text-white! font-semibold">{formatCurrency(debt.montoTotal)}</p>
+                      <p className="text-white! font-semibold">{formatCurrency(debt.totalMount)}</p>
                     </div>
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-col gap-y-1">
                       <p className="text-gray">Abonos</p>
-                      <p className="text-white! font-semibold">{debt.abonos.length} pagos</p>
+                      <p className="text-white! font-semibold">{debt.partialPayments.length} pagos</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-y-1 p-3 rounded-xl bg-secondary/50 mb-4">
                   <p className="text-gray">Último abono</p>
-                  <p className="text-white! font-semibold">{formatCurrency(debt.abonos[debt.abonos.length - 1]?.monto ?? 0)}</p>
-                  <p className="text-gray">{debt.abonos[debt.abonos.length - 1]?.fecha ?? ''}</p>
+                  <p className="text-white! font-semibold">{formatCurrency(debt.partialPayments[debt.partialPayments.length - 1]?.mount ?? 0)}</p>
+                  <p className="text-gray">{debt.partialPayments[debt.partialPayments.length - 1]?.date ?? ''}</p>
                 </div>
                 <button onClick={() => openPartialPaymentDialog(debt)} className="cursor-pointer font-medium flex justify-center items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
                   <Plus className="h-4 w-4" />

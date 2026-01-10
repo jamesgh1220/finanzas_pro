@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, DollarSign, AlertCircle, CreditCard, Wallet } from "lucide-react";
 import {
   LineChart,
@@ -27,58 +27,58 @@ export default function HomeDashboard() {
     )
   }
 
-  const getTotalDebts = (debts = []) => debts.reduce((total, debt) => total + (debt.montoTotal || 0), 0);
+  const getTotalDebts = (debts = []) => debts.reduce((total, debt) => total + (debt.totalMount || 0), 0);
 
   const getTotalPartialPayment = (debts = []) =>
     debts.reduce((total, debt) => {
-      const abonosSum = debt.abonos?.reduce(
-        (sum, abono) => sum + (abono.monto || 0),
+      const partialSum = debt.partialPayments?.reduce(
+        (sum, partial) => sum + (partial.mount || 0),
         0
       ) ?? 0
 
-      return total + abonosSum
+      return total + partialSum
     }, 0);
 
-  const buildHistoryProgress = (deudas) => {
-    const mesesMap = {}
-    const nombresMes = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+  const buildHistoryProgress = (debts) => {
+    const monthsMap = {}
+    const namesMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
-    const deudaTotal = deudas.reduce(
-      (acc, deuda) => acc + deuda.montoTotal,
+    const deudaTotal = debts.reduce(
+      (acc, debt) => acc + debt.montoTotal,
       0
-    )
+    );
 
     // 1. Agrupar abonos por mes
-    deudas.forEach(deuda => {
-      deuda.abonos.forEach(abono => {
-        const fecha = new Date(abono.fecha)
-        const mesIndex = fecha.getMonth()
-        const mesNombre = nombresMes[mesIndex]
+    debts.forEach(debt => {
+      debt.partialPayments.forEach(partial => {
+        const fecha = new Date(partial.date);
+        const mesIndex = fecha.getMonth();
+        const monthName = namesMonths[mesIndex];
 
-        if (!mesesMap[mesIndex]) {
-          mesesMap[mesIndex] = {
-            mes: mesNombre,
-            pagado: 0
-          }
+        if (!monthsMap[mesIndex]) {
+          monthsMap[mesIndex] = {
+            month: monthName,
+            paid: 0
+          };
         }
 
-        mesesMap[mesIndex].pagado += abono.monto
+        monthsMap[mesIndex].paid += partial.mount;
       })
-    })
+    });
 
     // 2. Ordenar por mes y acumular pagos
-    let acumulado = 0
+    let acc = 0;
 
-    return Object.keys(mesesMap)
+    return Object.keys(monthsMap)
       .sort((a, b) => a - b)
       .map(mesIndex => {
-        acumulado += mesesMap[mesIndex].pagado
+        acc += monthsMap[mesIndex].paid;
 
         return {
-          mes: mesesMap[mesIndex].mes,
-          deuda: deudaTotal,
-          pagado: acumulado
-        }
+          month: monthsMap[mesIndex].month,
+          debt: deudaTotal,
+          paid: acc
+        };
       })
   }
 
@@ -116,6 +116,8 @@ export default function HomeDashboard() {
   }
 
   const cashFlow = buildCashFlow(incomes);
+
+  const totalPaid = (debt) => debt.partialPayments.reduce((sum, partial) => sum + partial.mount, 0);
 
   useEffect(() => {
     const storedDebts = localStorage.getItem("debts")
@@ -211,7 +213,7 @@ export default function HomeDashboard() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="mes" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
+                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
                   <YAxis
                     stroke="rgba(255,255,255,0.5)"
                     tick={{ fill: "rgba(255,255,255,0.7)" }}
@@ -228,7 +230,7 @@ export default function HomeDashboard() {
                   <Legend />
                   <Area
                     type="monotone"
-                    dataKey="pagado"
+                    dataKey="paid"
                     stroke="#10B981"
                     strokeWidth={2}
                     fillOpacity={1}
@@ -291,6 +293,44 @@ export default function HomeDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
+        </div>
+
+        {/* Deudas pendientes */}
+        <div className="p-6 bg-card border border-slate-700 rounded-3xl">
+          <div className="inline-flex items-center gap-x-2">
+            <CreditCard className="h-5 w-5" />
+            <h3 className="font-semibold text-xl">Deudas activas</h3>
+          </div>
+          <p className="text-gray mb-8">Estado actual de cada deuda</p>
+          {debts.map((debt) => {
+            const paid = totalPaid(debt);
+            const remaining = debt.totalMount - paid;
+            const percentage = Math.round((paid / debt.totalMount) * 100);
+
+            return (
+              <div className="space-y-2" key={debt.id}>
+                <div className="flex font-semibold mt-8">
+                  <div>
+                    <p className="text-base leading-3">{debt.name}</p>
+                    <span className="text-sm text-gray font-normal">Cuota mínima: $ {debt.minimumFee.toLocaleString("es-CO")} / mes</span>
+                  </div>
+                  <div className="ml-auto">
+                    <p className="text-primary">{percentage}.0 %</p>
+                  </div>
+                </div>
+                <div className="relative h-2 bg-primary/50 rounded-xl ml-auto w-full">
+                  <div
+                    className="absolute left-0 top-0 h-full bg-primary rounded-xl"
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+                <div className="inline-flex w-full">
+                  <p className="text-success text-sm">Pagado: $ {paid.toLocaleString("es-CO")}</p>
+                  <p className="ml-auto text-danger text-sm">Falta: $ {remaining.toLocaleString("es-CO")}</p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
     </>

@@ -2,10 +2,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 export default function GraphsHistory({ debts, formatCurrency }) {
   const chartData = debts.map((debt) => {
-    const totalPaid = debt.abonos.reduce((sum, partialPayment) => sum + partialPayment.monto, 0)
-    const pendingPayment = debt.montoTotal - totalPaid
+    const totalPaid = debt.partialPayments.reduce((sum, partialPayment) => sum + partialPayment.mount, 0)
+    const pendingPayment = debt.totalMount - totalPaid
     return {
-      nombre: debt.nombre,
+      name: debt.name,
       paid: totalPaid,
       pendingPayment: pendingPayment > 0 ? pendingPayment : 0,
     }
@@ -19,7 +19,7 @@ export default function GraphsHistory({ debts, formatCurrency }) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="nombre" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
+            <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
             <YAxis
               stroke="rgba(255,255,255,0.5)"
               tick={{ fill: "rgba(255,255,255,0.7)" }}

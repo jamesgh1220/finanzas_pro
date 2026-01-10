@@ -82,7 +82,7 @@ export default function Income() {
     })
   }
 
-  const handleAddGasto = (e) => {
+  const handleAddExpense = (e) => {
     e.preventDefault()
     if (!selectedIncome) return
 
@@ -251,7 +251,7 @@ export default function Income() {
             Registra un gasto para: {selectedIncome?.month} {selectedIncome?.year}
           </p>
 
-          <form onSubmit={handleAddGasto} className="space-y-4">
+          <form onSubmit={handleAddExpense} className="space-y-4">
             {/* CATEGORIA */}
             <div>
               <label className="text-sm">Categoría</label>

@@ -10,20 +10,20 @@ export default function DeudasSection() {
   const dialogRef = useRef(null);
   const partialPaymentDialogRef = useRef(null);
   const [form, setForm] = useState({
-    nombre: "",
-    montoTotal: "",
-    mesesEstimados: "",
+    name: "",
+    totalMount: "",
+    estimateMonths: "",
   });
   const [partialPaymentForm, setPartialPaymentForm] = useState({
-    monto: "",
-    fecha: new Date().toISOString().split("T")[0],
-    descripcion: "",
+    mount: "",
+    date: new Date().toISOString().split("T")[0],
+    description: "",
   });
 
   const openDialog = () => dialogRef.current?.showModal();
   const closeDialog = () => dialogRef.current?.close();
 
-  const [deudas, setDeudas] = useState(() => {
+  const [debts, setDebts] = useState(() => {
     if (typeof window === "undefined") return [];
     try {
       const stored = localStorage.getItem("debts");
@@ -33,29 +33,29 @@ export default function DeudasSection() {
     }
   });
 
-  const [deudaSeleccionadaId, setDeudaSeleccionadaId] = useState(null);
-  const deudaSeleccionada = deudas.find((d) => d.id === deudaSeleccionadaId);
+  const [selectedDebtId, setSelectedDebtId] = useState(null);
+  const selectedDebt = debts.find((d) => d.id === selectedDebtId);
 
-  const cuotaMinima =
-    form.montoTotal && form.mesesEstimados
-      ? Number(form.montoTotal) / Number(form.mesesEstimados)
+  const minimumFee =
+    form.totalMount && form.estimateMonths
+      ? Number(form.totalMount) / Number(form.estimateMonths)
       : 0
 
-  const handleCreateDeuda = (e) => {
+  const handleAddDebt = (e) => {
     e.preventDefault();
 
-    const nuevaDeuda = {
+    const newDebt = {
       id: Date.now().toString(),
-      fecha: new Date().toISOString(),
-      nombre: form.nombre,
-      montoTotal: Number(form.montoTotal),
-      mesesEstimados: Number(form.mesesEstimados),
-      cuotaMinima,
-      abonos: [],
+      date: new Date().toISOString(),
+      name: form.name,
+      totalMount: Number(form.totalMount),
+      estimateMonths: Number(form.estimateMonths),
+      minimumFee,
+      partialPayments: [],
     };
 
-    setDeudas((prev) => [...prev, nuevaDeuda]);
-    setForm({ nombre: "", montoTotal: "", mesesEstimados: "" });
+    setDebts((prev) => [...prev, newDebt]);
+    setForm({ name: "", totalMount: "", estimateMonths: "" });
     closeDialog();
   }
 
@@ -67,44 +67,44 @@ export default function DeudasSection() {
     }).format(value);
 
   const handleDelete = (id) => {
-    setDeudas(deudas.filter((d) => d.id !== id));
+    setDebts(debts.filter((d) => d.id !== id));
   }
 
   const openPartialPaymentDialog = (deuda) => {
-    setDeudaSeleccionadaId(deuda.id)
+    setSelectedDebtId(deuda.id)
     partialPaymentDialogRef.current?.showModal()
   }
 
   const closePartialPaymentDialog = () => {
     partialPaymentDialogRef.current?.close()
-    setDeudaSeleccionadaId(null)
+    setSelectedDebtId(null)
     setPartialPaymentForm({
-      monto: "",
-      fecha: new Date().toISOString().split("T")[0],
-      descripcion: "",
+      mount: "",
+      date: new Date().toISOString().split("T")[0],
+      description: "",
     })
   }
 
   const handleAddPartialPayment = (e) => {
     e.preventDefault();
 
-    if (!deudaSeleccionadaId) return;
+    if (!selectedDebtId) return;
 
     const newPartialPayment = {
       id: Date.now().toString(),
-      monto: Number(partialPaymentForm.monto),
-      fecha: partialPaymentForm.fecha,
-      descripcion: partialPaymentForm.descripcion || undefined,
+      mount: Number(partialPaymentForm.mount),
+      date: partialPaymentForm.date,
+      description: partialPaymentForm.description || undefined,
     };
     
-    setDeudas((prevDeudas) =>
-      prevDeudas.map((deuda) =>
-        deuda.id === deudaSeleccionadaId
+    setDebts((prevDebts) =>
+      prevDebts.map((debt) =>
+        debt.id === selectedDebtId
           ? {
-              ...deuda,
-              abonos: [...(deuda.abonos ?? []), newPartialPayment],
+              ...debt,
+              partialPayments: [...(debt.partialPayments ?? []), newPartialPayment],
             }
-          : deuda
+          : debt
       )
     );
 
@@ -112,26 +112,26 @@ export default function DeudasSection() {
   }
 
   useEffect(() => {
-    const storedDeudas = localStorage.getItem("debts")
-    if (storedDeudas) {
+    const storedDebts = localStorage.getItem("debts")
+    if (storedDebts) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDeudas(JSON.parse(storedDeudas));
+      setDebts(JSON.parse(storedDebts));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("debts", JSON.stringify(deudas))
-  }, [deudas]);
+    localStorage.setItem("debts", JSON.stringify(debts))
+  }, [debts]);
 
   return (
     <section className="space-y-6 bounceIn container mx-auto px-4 lg:px-8">
       {/* Header */}
-      <HeaderDebts debts={deudas} formatCurrency={formatCurrency} openDialog={openDialog} />
+      <HeaderDebts debts={debts} formatCurrency={formatCurrency} openDialog={openDialog} />
       {/* Graficas */}
-      { deudas.length > 0 &&  <GraphsHistory debts={deudas} formatCurrency={formatCurrency} />}
+      { debts.length > 0 &&  <GraphsHistory debts={debts} formatCurrency={formatCurrency} />}
       {/* Lista de deudas */}
       <List
-        debts={deudas}
+        debts={debts}
         formatCurrency={formatCurrency}
         handleDelete={handleDelete}
         openPartialPaymentDialog={openPartialPaymentDialog}
@@ -152,13 +152,13 @@ export default function DeudasSection() {
           Registra una nueva deuda para llevar su control y seguimiento
         </p>
 
-        <form onSubmit={handleCreateDeuda} className="space-y-4">
+        <form onSubmit={handleAddDebt} className="space-y-4">
           <div>
             <label className="text-sm">Nombre de la deuda</label>
             <input
               className="w-full mt-1 px-3 py-2 rounded-xl bg-black border border-zinc-700"
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
           </div>
@@ -168,9 +168,9 @@ export default function DeudasSection() {
             <input
               type="number"
               className="w-full mt-1 px-3 py-2 rounded-xl bg-black border border-zinc-700"
-              value={form.montoTotal}
+              value={form.totalMount}
               onChange={(e) =>
-                setForm({ ...form, montoTotal: e.target.value })
+                setForm({ ...form, totalMount: e.target.value })
               }
               required
             />
@@ -181,22 +181,22 @@ export default function DeudasSection() {
             <input
               type="number"
               className="w-full mt-1 px-3 py-2 rounded-xl bg-black border border-zinc-700"
-              value={form.mesesEstimados}
+              value={form.estimateMonths}
               onChange={(e) =>
-                setForm({ ...form, mesesEstimados: e.target.value })
+                setForm({ ...form, estimateMonths: e.target.value })
               }
               required
             />
           </div>
 
-          {cuotaMinima > 0 && (
+          {minimumFee > 0 && (
             <div className="p-3 rounded bg-primary/10">
               <div className="flex items-center gap-2 text-primary">
                 <Calculator className="h-4 w-4" />
                 Cuota mínima
               </div>
               <p className="text-xl font-bold">
-                {formatCurrency(cuotaMinima)}
+                {formatCurrency(minimumFee)}
               </p>
             </div>
           )}
@@ -231,7 +231,7 @@ export default function DeudasSection() {
       >
         <h3 className="text-lg font-semibold mb-1">Agregar Abono</h3>
         <p className="text-sm text-gray-400 mb-4">
-          Registra un pago para: <b>{deudaSeleccionada?.nombre}</b>
+          Registra un pago para: <b>{selectedDebt?.nombre}</b>
         </p>
 
         <form onSubmit={handleAddPartialPayment} className="space-y-4">
@@ -240,9 +240,9 @@ export default function DeudasSection() {
             <input
               type="number"
               className="w-full mt-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700"
-              value={partialPaymentForm.monto}
+              value={partialPaymentForm.mount}
               onChange={(e) =>
-                setPartialPaymentForm({ ...partialPaymentForm, monto: e.target.value })
+                setPartialPaymentForm({ ...partialPaymentForm, mount: e.target.value })
               }
               required
             />
@@ -253,9 +253,9 @@ export default function DeudasSection() {
             <input
               type="date"
               className="w-full mt-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700"
-              value={partialPaymentForm.fecha}
+              value={partialPaymentForm.date}
               onChange={(e) =>
-                setPartialPaymentForm({ ...partialPaymentForm, fecha: e.target.value })
+                setPartialPaymentForm({ ...partialPaymentForm, date: e.target.value })
               }
               required
             />
@@ -266,9 +266,9 @@ export default function DeudasSection() {
             <textarea
               rows={3}
               className="w-full mt-1 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 resize-none"
-              value={partialPaymentForm.descripcion}
+              value={partialPaymentForm.description}
               onChange={(e) =>
-                setPartialPaymentForm({ ...partialPaymentForm, descripcion: e.target.value })
+                setPartialPaymentForm({ ...partialPaymentForm, description: e.target.value })
               }
             />
           </div>
