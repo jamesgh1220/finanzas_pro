@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Finanzas PRO
 
-## Getting Started
+Aplicación web para la gestión de finanzas personales que permite visualizar un dashboard con métricas clave, administrar deudas y registrar ingresos con gráficos interactivos.
 
-First, run the development server:
+## Almacenamiento
+
+Los datos se almacenan en **localStorage** del navegador. Esto significa que la información persiste localmente en el dispositivo del usuario, pero no se sincroniza entre dispositivos ni se respalda en un servidor.
+
+## Tecnologías
+
+- **Framework:** Next.js 16
+- **Lenguaje:** TypeScript / JavaScript (JSX)
+- **UI:** React 19
+- **Estilos:** Tailwind CSS 4
+- **Gráficos:** Recharts
+- **Íconos:** Lucide React
+
+## Arquitectura del Proyecto
+
+```
+finanzas_pro/
+├── app/
+│   ├── components/
+│   │   ├── dashboard/       # Componentes del dashboard principal
+│   │   │   └── Home.jsx
+│   │   ├── debts/           # Módulo de gestión de deudas
+│   │   │   ├── Debts.jsx
+│   │   │   ├── HeaderDebts.jsx
+│   │   │   ├── GraphsHistory.jsx
+│   │   │   └── List.jsx
+│   │   ├── income/          # Módulo de gestión de ingresos
+│   │   │   ├── Income.jsx
+│   │   │   ├── HeaderIncomes.jsx
+│   │   │   ├── GraphsHistory.jsx
+│   │   │   └── List.jsx
+│   │   └── ui/              # Componentes de interfaz reutilizables
+│   │       ├── HeaderComponent.jsx
+│   │       └── TabsComponent.jsx
+│   ├── assets/              # Recursos estáticos
+│   ├── resources/           # Datos y recursos de la aplicación
+│   ├── layout.tsx           # Layout principal
+│   ├── page.tsx             # Página principal con navegación por tabs
+│   └── globals.css          # Estilos globales
+├── public/                  # Archivos públicos
+├── package.json
+├── tailwind.config.ts
+├── tsconfig.json
+└── next.config.ts
+```
+
+## Instalación y Ejecución
+
+### Prerrequisitos
+
+- Node.js 18.x o superior
+- npm, yarn, pnpm o bun
+
+### Pasos para ejecutar el proyecto
+
+1. **Clonar el repositorio**
+
+```bash
+git clone https://github.com/jamesgh1220/finanzas_pro.git
+cd finanzas_pro
+```
+
+2. **Instalar dependencias**
+
+```bash
+npm install
+# o
+yarn install
+# o
+pnpm install
+```
+
+3. **Ejecutar en modo desarrollo**
 
 ```bash
 npm run dev
-# or
+# o
 yarn dev
-# or
+# o
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. **Abrir en el navegador**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Navega a [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Scripts disponibles
 
-## Learn More
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Inicia el servidor de desarrollo |
+| `npm run build` | Genera el build de producción |
+| `npm run start` | Inicia el servidor en modo producción |
+| `npm run lint` | Ejecuta el linter (ESLint) |
 
-To learn more about Next.js, take a look at the following resources:
+## Licencia
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Desarrollado por **John James Gallego Hernández**
