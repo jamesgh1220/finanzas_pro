@@ -5,6 +5,8 @@ import { Calculator } from "lucide-react";
 import HeaderDebts from '@/app/components/debts/HeaderDebts';
 import GraphsHistory from '@/app/components/debts/GraphsHistory';
 import List from '@/app/components/debts/List';
+import { useDebts } from "@/app/hooks/useDebts";
+import ConfirmDialog from "@/app/components/ui/ConfirmDialog";
 
 export default function DeudasSection() {
   const dialogRef = useRef(null);
@@ -20,18 +22,12 @@ export default function DeudasSection() {
     description: "",
   });
 
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null, name: "" });
+
   const openDialog = () => dialogRef.current?.showModal();
   const closeDialog = () => dialogRef.current?.close();
 
-  const [debts, setDebts] = useState(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const stored = localStorage.getItem("debts");
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const { debts, addDebt, deleteDebt, addPartialPayment, loading } = useDebts();
 
   const [selectedDebtId, setSelectedDebtId] = useState(null);
   const selectedDebt = debts.find((d) => d.id === selectedDebtId);
@@ -41,7 +37,7 @@ export default function DeudasSection() {
       ? Number(form.totalMount) / Number(form.estimateMonths)
       : 0
 
-  const handleAddDebt = (e) => {
+  const handleAddDebt = async (e) => {
     e.preventDefault();
 
     const newDebt = {
@@ -54,9 +50,11 @@ export default function DeudasSection() {
       partialPayments: [],
     };
 
-    setDebts((prev) => [...prev, newDebt]);
-    setForm({ name: "", totalMount: "", estimateMonths: "" });
-    closeDialog();
+    const result = await addDebt(newDebt);
+    if (result.success) {
+      setForm({ name: "", totalMount: "", estimateMonths: "" });
+      closeDialog();
+    }
   }
 
   const formatCurrency = (value) =>
@@ -67,8 +65,16 @@ export default function DeudasSection() {
     }).format(value);
 
   const handleDelete = (id) => {
-    setDebts(debts.filter((d) => d.id !== id));
+    const debt = debts.find(d => d.id === id);
+    setDeleteConfirm({ open: true, id, name: debt?.name || "" });
   }
+
+  const confirmDelete = async () => {
+    if (deleteConfirm.id) {
+      await deleteDebt(deleteConfirm.id);
+    }
+    setDeleteConfirm({ open: false, id: null, name: "" });
+  };
 
   const openPartialPaymentDialog = (deuda) => {
     setSelectedDebtId(deuda.id)
@@ -85,7 +91,7 @@ export default function DeudasSection() {
     })
   }
 
-  const handleAddPartialPayment = (e) => {
+  const handleAddPartialPayment = async (e) => {
     e.preventDefault();
 
     if (!selectedDebtId) return;
@@ -96,32 +102,12 @@ export default function DeudasSection() {
       date: partialPaymentForm.date,
       description: partialPaymentForm.description || undefined,
     };
-    
-    setDebts((prevDebts) =>
-      prevDebts.map((debt) =>
-        debt.id === selectedDebtId
-          ? {
-              ...debt,
-              partialPayments: [...(debt.partialPayments ?? []), newPartialPayment],
-            }
-          : debt
-      )
-    );
 
+    await addPartialPayment(selectedDebtId, newPartialPayment);
     closePartialPaymentDialog();
   }
 
-  useEffect(() => {
-    const storedDebts = localStorage.getItem("debts")
-    if (storedDebts) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDebts(JSON.parse(storedDebts));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("debts", JSON.stringify(debts))
-  }, [debts]);
+  useEffect(() => {}, []);
 
   return (
     <section className="space-y-6 bounceIn container mx-auto px-4 lg:px-8">
@@ -290,6 +276,14 @@ export default function DeudasSection() {
           </div>
         </form>
       </dialog>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, id: null, name: "" })}
+        onConfirm={confirmDelete}
+        title="Eliminar deuda"
+        message={`¿Estás seguro de que deseas eliminar la deuda "${deleteConfirm.name}"? Esta acción no se puede deshacer.`}
+      />
     </section>
   )
 }

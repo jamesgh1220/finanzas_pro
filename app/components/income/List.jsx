@@ -1,7 +1,7 @@
 import { Calendar, Trash2, Plus } from "lucide-react";
 
 export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
-  const getTotalIncomesByMonth = (income) => (income.expenses ?? []).reduce((total, income) => total + income.mount, 0);
+  const getTotalIncomesByMonth = (income) => (income.expenses ?? []).reduce((total, expense) => total + expense.mount, 0);
 
   return (
     <>
@@ -28,7 +28,7 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
               {/* Monto */}
               <div className="text-right">
                 <button
-                  onClick={() => handleDelete(income.id)}
+                  onClick={() => handleDelete(income.id, 'income', `${income.month} ${income.year}`)}
                   className="text-slate-400 cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                 >
                   <Trash2 className="size-5" />
@@ -63,7 +63,7 @@ export default function List({ incomes, openAddIncomeDialog, handleDelete }) {
                         )}
                       </div>
                       <button
-                        onClick={() => handleDelete(gasto.id)}
+                        onClick={() => handleDelete(gasto.id, 'expense', gasto.categorie, income.id)}
                         className="text-gray cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                       >
                         <Trash2 className="size-5" />

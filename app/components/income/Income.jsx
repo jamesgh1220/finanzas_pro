@@ -6,6 +6,8 @@ import List from '@/app/components/income/List';
 import GraphsHistory from '@/app/components/income/GraphsHistory';
 import { Calculator } from "lucide-react";
 import { MONTHS, QUINCENAL, CATEGORIES_INCOMES } from '@/app/resources/constants';
+import { useIncomes } from "@/app/hooks/useIncomes";
+import ConfirmDialog from "@/app/components/ui/ConfirmDialog";
 
 export default function Income() {
   const newMonthRef = useRef(null);
@@ -13,20 +15,20 @@ export default function Income() {
   const open = () => newMonthRef.current?.showModal();
   const close = () => newMonthRef.current?.close();
 
-  const [incomes, setIncomes] = useState(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const stored = localStorage.getItem("incomes");
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const { incomes, addIncome, addExpense, deleteIncome, deleteExpense, loading } = useIncomes();
   const [expenseForm, setExpenseForm] = useState({
     categorie: "",
     mount: "",
     date: new Date().toISOString().split("T")[0],
     description: "",
+  });
+
+  const [deleteConfirm, setDeleteConfirm] = useState({ 
+    open: false, 
+    id: null, 
+    type: null, // 'income' or 'expense'
+    name: "",
+    incomeId: null
   });
 
   const now = new Date();
@@ -40,7 +42,7 @@ export default function Income() {
   const [selectedIncome, setSelectedIncome] = useState(null);
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!month || !year || !totalIncomes) return
@@ -54,16 +56,13 @@ export default function Income() {
       expenses: [],
     };
 
-    setIncomes((prev) => {
-      const updated = [...prev, newIncome];
-      localStorage.setItem("incomes", JSON.stringify(updated));
-      return updated;
-    })
-
-    setMonth(enabledMonths[0]);
-    setYear(now.getFullYear().toString());
-    setIngresoTotal("");
-    close();
+    const result = await addIncome(newIncome);
+    if (result.success) {
+      setMonth(enabledMonths[0]);
+      setYear(now.getFullYear().toString());
+      setIngresoTotal("");
+      close();
+    }
   };
 
   const openAddIncomeDialog = (income) => {
@@ -82,7 +81,7 @@ export default function Income() {
     })
   }
 
-  const handleAddExpense = (e) => {
+  const handleAddExpense = async (e) => {
     e.preventDefault()
     if (!selectedIncome) return
 
@@ -94,34 +93,24 @@ export default function Income() {
       description: expenseForm.description || undefined,
     }
 
-    setIncomes((prev) => {
-      const updated = prev.map((income) =>
-        income.id === selectedIncome.id
-          ? {
-              ...income,
-              expenses: [...(income.expenses ?? []), newExpense],
-            }
-          : income
-      )
-
-      localStorage.setItem("incomes", JSON.stringify(updated))
-      return updated
-    })
-
-    closeAddGastoDialog()
+    await addExpense(selectedIncome.id, newExpense);
+    closeAddGastoDialog();
   }
 
-  useEffect(() => {
-    const storedIncomes = localStorage.getItem("incomes")
-    if (storedIncomes) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIncomes(JSON.parse(storedIncomes));
-    }
-  }, []);
+  const handleDelete = (id, type, name, incomeId = null) => {
+    setDeleteConfirm({ open: true, id, type, name, incomeId });
+  }
 
-  useEffect(() => {
-    localStorage.setItem("incomes", JSON.stringify(incomes))
-  }, [incomes]);
+  const confirmDelete = async () => {
+    if (deleteConfirm.type === 'income') {
+      await deleteIncome(deleteConfirm.id);
+    } else if (deleteConfirm.type === 'expense' && deleteConfirm.incomeId) {
+      await deleteExpense(deleteConfirm.incomeId, deleteConfirm.id);
+    }
+    setDeleteConfirm({ open: false, id: null, type: null, name: "", incomeId: null });
+  }
+
+  useEffect(() => {}, []);
 
   return (
     <>
@@ -131,7 +120,7 @@ export default function Income() {
         {/* GRAFICAS */}
         {incomes.length > 0 && <GraphsHistory incomes={incomes} />}
         {/* Lista de ingresos */}
-        <List incomes={incomes} openAddIncomeDialog={openAddIncomeDialog} />
+        <List incomes={incomes} openAddIncomeDialog={openAddIncomeDialog} handleDelete={handleDelete} />
         {/* NEW MONTH */}
         <dialog
           ref={newMonthRef}
@@ -329,6 +318,17 @@ export default function Income() {
             </div>
           </form>
         </dialog>
+
+        <ConfirmDialog
+          isOpen={deleteConfirm.open}
+          onClose={() => setDeleteConfirm({ open: false, id: null, type: null, name: "", incomeId: null })}
+          onConfirm={confirmDelete}
+          title={deleteConfirm.type === 'expense' ? "Eliminar gasto" : "Eliminar ingreso"}
+          message={deleteConfirm.type === 'expense' 
+            ? `¿Estás seguro de que deseas eliminar el gasto "${deleteConfirm.name}"?` 
+            : `¿Estás seguro de que deseas eliminar el ingreso de "${deleteConfirm.name}"? Esta acción no se puede deshacer.`
+          }
+        />
       </section>
     </>
   );

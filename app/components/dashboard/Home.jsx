@@ -12,10 +12,12 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useDebts } from "@/app/hooks/useDebts";
+import { useIncomes } from "@/app/hooks/useIncomes";
 
 export default function HomeDashboard() {
-  const [debts, setDebts] = useState([]);
-  const [incomes, setIncomes] = useState([]);
+  const { debts, loading: debtsLoading } = useDebts();
+  const { incomes, loading: incomesLoading } = useIncomes();
 
   const mostRecentIncome = incomes[incomes?.length - 1 ?? 0];
   const totalIncomesActualMonth = () => {
@@ -118,20 +120,6 @@ export default function HomeDashboard() {
   const cashFlow = buildCashFlow(incomes);
 
   const totalPaid = (debt) => debt.partialPayments.reduce((sum, partial) => sum + partial.mount, 0);
-
-  useEffect(() => {
-    const storedDebts = localStorage.getItem("debts")
-    if (storedDebts) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDebts(JSON.parse(storedDebts));
-    }
-
-    const storedIncomes = localStorage.getItem("incomes")
-    if (storedIncomes) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIncomes(JSON.parse(storedIncomes));
-    }
-  }, []);
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-CO", {
