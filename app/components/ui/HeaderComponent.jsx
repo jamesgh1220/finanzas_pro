@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { Wallet, LogOut } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
+import ConfirmDialog from "@/app/components/ui/ConfirmDialog";
 
 export default function Header() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -34,7 +37,7 @@ export default function Header() {
                 </span>
               )}
               <button
-                onClick={handleLogout}
+                onClick={() => setShowLogoutConfirm(true)}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
                 title="Cerrar sesión"
               >
@@ -45,6 +48,16 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        title="Cerrar sesión"
+        message="¿Estás seguro de que deseas cerrar sesión? Tendrás que volver a iniciar sesión para acceder a tus datos."
+        confirmText="Cerrar sesión"
+        cancelText="Cancelar"
+      />
     </>
   );
 }
