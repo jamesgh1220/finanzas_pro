@@ -24,8 +24,8 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-zinc-400 text-sm">Cargando...</p>
+          <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-zinc-500 text-sm">Cargando...</p>
         </div>
       </div>
     );
@@ -36,15 +36,15 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen">
+      <Header />
+      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <main>
-        <Header />
-        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-        <section className="px-4">
+        <div key={activeTab} className="animate-fade-in">
           {activeTab === "dashboard" && <HomeDashboard />}
           {activeTab === "deudas" && <Debts />}
           {activeTab === "ingresos" && <Income />}
-        </section>
+        </div>
       </main>
     </div>
   );

@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, DollarSign, AlertCircle, CreditCard, Wallet } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  AlertCircle,
+  CreditCard,
+  Wallet,
+  PiggyBank,
+  Target,
+} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -15,74 +24,91 @@ import {
 import { useDebts } from "@/app/hooks/useDebts";
 import { useIncomes } from "@/app/hooks/useIncomes";
 
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const formatCompact = (value) => {
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+  return `$${value}`;
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl">
+        <p className="text-zinc-400 text-sm mb-2">{label}</p>
+        {payload.map((entry, index) => (
+          <p key={index} className="text-sm font-medium" style={{ color: entry.color }}>
+            {entry.name}: {formatCurrency(entry.value)}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function HomeDashboard() {
   const { debts, loading: debtsLoading } = useDebts();
   const { incomes, loading: incomesLoading } = useIncomes();
 
   const mostRecentIncome = incomes[incomes?.length - 1 ?? 0];
+
   const totalIncomesActualMonth = () => {
     if (!incomes.length || !incomes[0].expenses) return 0;
-
     return incomes[0].expenses.reduce(
       (total, expense) => total + Number(Math.round(expense.mount)),
       0
     );
-  }
+  };
 
-  const getTotalDebts = (debts = []) => debts.reduce((total, debt) => total + (debt.totalMount || 0), 0);
+  const getTotalDebts = (debts = []) =>
+    debts.reduce((total, debt) => total + (debt.totalMount || 0), 0);
 
   const getTotalPartialPayment = (debts = []) =>
     debts.reduce((total, debt) => {
-      const partialSum = debt.partialPayments?.reduce(
-        (sum, partial) => sum + (partial.mount || 0),
-        0
-      ) ?? 0
-
-      return total + partialSum
+      const partialSum =
+        debt.partialPayments?.reduce((sum, partial) => sum + (partial.mount || 0), 0) ?? 0;
+      return total + partialSum;
     }, 0);
 
   const buildHistoryProgress = (debts) => {
-    const monthsMap = {}
-    const namesMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    const monthsMap = {};
+    const namesMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
-    const deudaTotal = debts.reduce(
-      (acc, debt) => acc + debt.montoTotal,
-      0
-    );
+    const deudaTotal = debts.reduce((acc, debt) => acc + debt.montoTotal, 0);
 
-    // 1. Agrupar abonos por mes
-    debts.forEach(debt => {
-      debt.partialPayments.forEach(partial => {
+    debts.forEach((debt) => {
+      debt.partialPayments.forEach((partial) => {
         const fecha = new Date(partial.date);
         const mesIndex = fecha.getMonth();
         const monthName = namesMonths[mesIndex];
 
         if (!monthsMap[mesIndex]) {
-          monthsMap[mesIndex] = {
-            month: monthName,
-            paid: 0
-          };
+          monthsMap[mesIndex] = { month: monthName, paid: 0 };
         }
-
         monthsMap[mesIndex].paid += partial.mount;
-      })
+      });
     });
 
-    // 2. Ordenar por mes y acumular pagos
     let acc = 0;
-
     return Object.keys(monthsMap)
       .sort((a, b) => a - b)
-      .map(mesIndex => {
+      .map((mesIndex) => {
         acc += monthsMap[mesIndex].paid;
-
         return {
           month: monthsMap[mesIndex].month,
           debt: deudaTotal,
-          paid: acc
+          paid: acc,
         };
-      })
-  }
+      });
+  };
 
   const historyProgress = buildHistoryProgress(debts);
 
@@ -100,227 +126,315 @@ export default function HomeDashboard() {
       Octubre: "Oct",
       Noviembre: "Nov",
       Diciembre: "Dic",
-    }
+    };
 
-    return incomes.map(month => {
-      const totalIncome = month.expenses.reduce(
-        (acc, expense) => acc + expense.mount,
-        0
-      )
-
+    return incomes.map((month) => {
+      const totalIncome = month.expenses.reduce((acc, expense) => acc + expense.mount, 0);
       return {
         mes: monthAbbreviaton[month.month] || month.month,
         ingresos: month.totalIncomes,
         gastos: totalIncome,
         disponible: month.totalIncomes - totalIncome,
-      }
-    })
-  }
+      };
+    });
+  };
 
   const cashFlow = buildCashFlow(incomes);
 
   const totalPaid = (debt) => debt.partialPayments.reduce((sum, partial) => sum + partial.mount, 0);
 
-  const formatCurrency = (value) =>
-    new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-    }).format(value);
+  const totalDebts = getTotalDebts(debts);
+  const totalPaidDebts = getTotalPartialPayment(debts);
+  const debtPercentage = totalDebts > 0 ? Math.round((totalPaidDebts / totalDebts) * 100) : 0;
+
+  const totalIncomes = mostRecentIncome?.totalIncomes ?? 0;
+  const totalExpenses = totalIncomesActualMonth();
+  const available = totalIncomes - totalExpenses;
+  const expensePercentage = totalIncomes > 0 ? Math.round((totalExpenses / totalIncomes) * 100) : 0;
+
+  const loading = debtsLoading || incomesLoading;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-zinc-500 text-sm">Cargando datos...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <section className="bounceIn space-y-8 container mx-auto px-4 lg:px-8 mb-16">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <div className="flex justify-between items-center">
-              <p className="text-gray text-base">Total deudas</p>
-              <div className="p-2 bg-danger/20 rounded-xl">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-8">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Deudas */}
+        <div className="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-danger/30 transition-all duration-300 card-hover animate-slide-up" style={{ animationDelay: '0ms' }}>
+          <div className="absolute inset-0 bg-danger/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-zinc-500 font-medium">Total Deudas</p>
+              <div className="p-2 rounded-xl bg-danger/10">
                 <AlertCircle className="h-5 w-5 text-danger" />
               </div>
             </div>
-            <h3 className="font-bold text-2xl mt-6">$ {getTotalDebts(debts).toLocaleString("es-CO")}</h3>
-            {debts?.length > 0 && <p className="text-gray">$ {getTotalPartialPayment(debts).toLocaleString("es-CO")} pagado ({Math.round((getTotalPartialPayment(debts) / getTotalDebts(debts)) * 100)}.0 %)</p>}
-            {debts?.length > 0 && <div className="relative h-2 bg-primary/50 rounded-xl ml-auto w-full mt-4">
-              <div
-                className="absolute left-0 top-0 h-full bg-primary rounded-xl"
-                style={{ width: `${Math.round((getTotalPartialPayment(debts) / getTotalDebts(debts)) * 100)}%` }}
-              />
-            </div>}
-          </div>
-          <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <div className="flex justify-between items-center">
-              <p className="text-gray text-base">Ingreso del mes</p>
-              <div className="p-2 bg-success/20 rounded-xl">
-                <TrendingUp className="h-5 w-5 text-success" />
+            <h3 className="text-2xl font-bold text-white mb-2">{formatCurrency(totalDebts)}</h3>
+            {debts?.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-500">Pagado</span>
+                  <span className="text-primary font-medium">{formatCurrency(totalPaidDebts)}</span>
+                </div>
+                <div className="relative h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary to-emerald-400 rounded-full transition-all duration-500"
+                    style={{ width: `${debtPercentage}%` }}
+                  />
+                </div>
+                <p className="text-xs text-zinc-500">{debtPercentage}% completado</p>
               </div>
-            </div>
-            <h3 className="font-bold text-2xl mt-6">$ {mostRecentIncome?.totalIncomes.toLocaleString("es-CO") ?? 0}</h3>
-            <h3 className="text-success">{mostRecentIncome?.month} {mostRecentIncome?.year}</h3>
-          </div>
-          <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <div className="flex justify-between items-center">
-              <p className="text-gray text-base">Gastos del mes</p>
-              <div className="p-2 bg-primary/20 rounded-xl">
-                <TrendingDown className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <h3 className="font-bold text-2xl mt-6">$ {totalIncomesActualMonth().toLocaleString("es-CO")}</h3>
-            {incomes?.length > 0 && <p className="text-gray">{Math.round((totalIncomesActualMonth() / mostRecentIncome?.totalIncomes) * 100)}.0 % del ingreso</p>}
-            {incomes?.length > 0 && <div className="relative h-2 bg-primary/50 rounded-xl ml-auto w-full mt-4">
-              <div
-                className="absolute left-0 top-0 h-full bg-primary rounded-xl"
-                style={{ width: `${Math.round((totalIncomesActualMonth() / mostRecentIncome?.totalIncomes) * 100)}%` }}
-              />
-            </div>}
-          </div>
-          <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <div className="flex justify-between items-center">
-              <p className="text-gray text-base">Disponible</p>
-              <div className="p-2 bg-success/20 rounded-xl">
-                <DollarSign className="h-5 w-5 text-success" />
-              </div>
-            </div>
-            <h3 className="font-bold text-2xl mt-6 text-success">$ { (mostRecentIncome?.totalIncomes ?? 0 - totalIncomesActualMonth()).toLocaleString("es-CO") }</h3>
-            {incomes?.length > 0 && <p className="text-gray">Después de gastos</p>}
+            )}
           </div>
         </div>
 
-        {/* Gráficas principales */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Gráfica de progreso de deudas */}
-          <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <h3 className="text-xl font-semibold">Progreso histórico de deudas</h3>
-            <p className="text-gray">Evolución de pagos</p>
-            <div className="h-72 w-full mt-8">
+        {/* Ingreso del Mes */}
+        <div className="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 transition-all duration-300 card-hover animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-zinc-500 font-medium">Ingreso del Mes</p>
+              <div className="p-2 rounded-xl bg-primary/10">
+                <TrendingUp className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-1">{formatCurrency(totalIncomes)}</h3>
+            <p className="text-sm text-zinc-500">{mostRecentIncome?.month} {mostRecentIncome?.year}</p>
+          </div>
+        </div>
+
+        {/* Gastos del Mes */}
+        <div className="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-accent/30 transition-all duration-300 card-hover animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-zinc-500 font-medium">Gastos del Mes</p>
+              <div className="p-2 rounded-xl bg-accent/10">
+                <TrendingDown className="h-5 w-5 text-accent" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-1">{formatCurrency(totalExpenses)}</h3>
+            {incomes?.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-500">Del ingreso</span>
+                  <span className="text-accent font-medium">{expensePercentage}%</span>
+                </div>
+                <div className="relative h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-accent to-orange-400 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(expensePercentage, 100)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Disponible */}
+        <div className="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-success/30 transition-all duration-300 card-hover animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <div className="absolute inset-0 bg-success/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-zinc-500 font-medium">Disponible</p>
+              <div className="p-2 rounded-xl bg-success/10">
+                <DollarSign className="h-5 w-5 text-success" />
+              </div>
+            </div>
+            <h3 className={`text-2xl font-bold mb-1 ${available >= 0 ? "text-success" : "text-danger"}`}>
+              {formatCurrency(available)}
+            </h3>
+            <p className="text-sm text-zinc-500">Después de gastos</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Progreso de Deudas */}
+        <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Target className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Progreso de Deudas</h3>
+              <p className="text-sm text-zinc-500">Evolución de pagos realizados</p>
+            </div>
+          </div>
+          <div className="h-72 mt-6">
+            {historyProgress.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={historyProgress}>
                   <defs>
-                    <linearGradient id="colorPagado" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                    <linearGradient id="colorPaid" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" tick={{ fill: "#71717a", fontSize: 12 }} />
                   <YAxis
-                    stroke="rgba(255,255,255,0.5)"
-                    tick={{ fill: "rgba(255,255,255,0.7)" }}
-                    tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
+                    stroke="rgba(255,255,255,0.3)"
+                    tick={{ fill: "#71717a", fontSize: 12 }}
+                    tickFormatter={formatCompact}
                   />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(30, 30, 40, 0.95)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value) => formatCurrency(value)}
-                  />
-                  <Legend />
+                  <Tooltip content={<CustomTooltip />} />
                   <Area
                     type="monotone"
                     dataKey="paid"
-                    stroke="#10B981"
+                    stroke="#22c55e"
                     strokeWidth={2}
                     fillOpacity={1}
-                    fill="url(#colorPagado)"
+                    fill="url(#colorPaid)"
                     name="Pagado"
                   />
                 </AreaChart>
               </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-zinc-500">
+                <p>No hay datos de pagos</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Flujo de Caja */}
+        <div className="p-6 rounded-2xl bg-white/5 border border-white/5 animate-slide-up" style={{ animationDelay: '400ms' }}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-accent/10">
+              <PiggyBank className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Flujo de Caja</h3>
+              <p className="text-sm text-zinc-500">Ingresos vs Gastos mensuales</p>
             </div>
           </div>
-
-          {/* Gráfica de flujo de caja */}
-          <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-            <h3 className="text-xl font-semibold">Flujo de caja mensual</h3>
-            <p className="text-gray">Ingresos, gastos y dinero disponible</p>
-            <div className="h-72 w-full mt-8">
+          <div className="h-72 mt-6">
+            {cashFlow.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={cashFlow}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="mes" stroke="rgba(255,255,255,0.5)" tick={{ fill: "rgba(255,255,255,0.7)" }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="mes" stroke="rgba(255,255,255,0.3)" tick={{ fill: "#71717a", fontSize: 12 }} />
                   <YAxis
-                    stroke="rgba(255,255,255,0.5)"
-                    tick={{ fill: "rgba(255,255,255,0.7)" }}
-                    tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
+                    stroke="rgba(255,255,255,0.3)"
+                    tick={{ fill: "#71717a", fontSize: 12 }}
+                    tickFormatter={formatCompact}
                   />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(30, 30, 40, 0.95)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value) => formatCurrency(value)}
-                  />
-                  <Legend />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend wrapperStyle={{ paddingTop: "10px" }} />
                   <Line
                     type="monotone"
                     dataKey="ingresos"
-                    stroke="#10B981"
+                    stroke="#22c55e"
                     strokeWidth={2}
                     name="Ingresos"
-                    dot={{ fill: "#10B981", r: 4 }}
+                    dot={{ fill: "#22c55e", r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="gastos"
-                    stroke="#EF4444"
+                    stroke="#ef4444"
                     strokeWidth={2}
                     name="Gastos"
-                    dot={{ fill: "#EF4444", r: 4 }}
+                    dot={{ fill: "#ef4444", r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="disponible"
-                    stroke="#60A5FA"
+                    stroke="#fbbf24"
                     strokeWidth={2}
                     name="Disponible"
-                    dot={{ fill: "#60A5FA", r: 4 }}
+                    dot={{ fill: "#fbbf24", r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-zinc-500">
+                <p>No hay datos de flujo de caja</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Deudas Activas */}
+      {debts?.length > 0 && (
+        <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-xl bg-danger/10">
+              <CreditCard className="h-5 w-5 text-danger" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Deudas Activas</h3>
+              <p className="text-sm text-zinc-500">Estado actual de cada deuda</p>
             </div>
           </div>
-        </div>
+          <div className="space-y-6">
+            {debts.map((debt) => {
+              const paid = totalPaid(debt);
+              const remaining = debt.totalMount - paid;
+              const percentage = Math.round((paid / debt.totalMount) * 100);
 
-        {/* Deudas pendientes */}
-        <div className="p-6 bg-card border border-slate-700 rounded-3xl">
-          <div className="inline-flex items-center gap-x-2">
-            <CreditCard className="h-5 w-5" />
-            <h3 className="font-semibold text-xl">Deudas activas</h3>
+              return (
+                <div key={debt.id} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div>
+                      <h4 className="text-base font-semibold text-white">{debt.name}</h4>
+                      <p className="text-sm text-zinc-500">
+                        Cuota mínima: {formatCurrency(Math.round(debt.minimumFee))}/mes
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-primary">{percentage}%</p>
+                      <p className="text-xs text-zinc-500">completado</p>
+                    </div>
+                  </div>
+                  <div className="relative h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary to-emerald-400 rounded-full transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mt-3 text-sm">
+                    <span className="text-success">Pagado: {formatCurrency(paid)}</span>
+                    <span className="text-danger">Falta: {formatCurrency(remaining)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <p className="text-gray mb-8">Estado actual de cada deuda</p>
-          {debts.map((debt) => {
-            const paid = totalPaid(debt);
-            const remaining = debt.totalMount - paid;
-            const percentage = Math.round((paid / debt.totalMount) * 100);
-
-            return (
-              <div className="space-y-2" key={debt.id}>
-                <div className="flex font-semibold mt-8">
-                  <div>
-                    <p className="text-base leading-3">{debt.name}</p>
-                    <span className="text-sm text-gray font-normal">Cuota mínima: $ {Math.round(debt.minimumFee).toLocaleString("es-CO")} / mes</span>
-                  </div>
-                  <div className="ml-auto">
-                    <p className="text-primary">{percentage}.0 %</p>
-                  </div>
-                </div>
-                <div className="relative h-2 bg-primary/50 rounded-xl ml-auto w-full">
-                  <div
-                    className="absolute left-0 top-0 h-full bg-primary rounded-xl"
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                <div className="inline-flex w-full">
-                  <p className="text-success text-sm">Pagado: $ {paid.toLocaleString("es-CO")}</p>
-                  <p className="ml-auto text-danger text-sm">Falta: $ {remaining.toLocaleString("es-CO")}</p>
-                </div>
-              </div>
-            )
-          })}
         </div>
-      </section>
-    </>
+      )}
+
+      {/* Empty State */}
+      {debts?.length === 0 && incomes?.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 px-4 rounded-2xl bg-white/5 border border-white/5">
+          <div className="relative mb-4">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
+            <div className="relative p-4 rounded-full bg-white/10">
+              <Wallet className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Bienvenido a FinanzasPro</h3>
+          <p className="text-zinc-500 text-center max-w-md">
+            Comienza agregando tus deudas e ingresos para ver el resumen de tu situación financiera.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

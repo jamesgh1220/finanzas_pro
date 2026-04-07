@@ -17,12 +17,12 @@ export const CATEGORIES_INCOMES = [
 ];
 
 export const CATEGORIES_COLORS = {
-  Arriendo: "#60A5FA",
-  Mercado: "#10B981",
-  Transporte: "#F59E0B",
-  Servicios: "#8B5CF6",
-  Entretenimiento: "#EC4899",
-  Salud: "#14B8A6",
-  Educación: "#F97316",
-  Otros: "#6B7280",
+  Arriendo: "#3B82F6",
+  Mercado: "#22c55e",
+  Transporte: "#f59e0b",
+  Servicios: "#8b5cf6",
+  Entretenimiento: "#ec4899",
+  Salud: "#14b8a6",
+  Educación: "#f97316",
+  Otros: "#6b7280",
 };
