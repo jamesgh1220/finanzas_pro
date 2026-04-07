@@ -110,5 +110,31 @@ export function useDebts() {
     }
   };
 
-  return { debts, loading, error, addDebt, deleteDebt, addPartialPayment, refresh: fetchDebts };
+  const deletePartialPayment = async (debtId, paymentId) => {
+    try {
+      const debt = debts.find((d) => d.id === debtId);
+      if (!debt) throw new Error("Deuda no encontrada");
+
+      const updatedPayments = debt.partialPayments.filter(p => p.id !== paymentId);
+
+      const { error } = await supabase
+        .from("debts")
+        .update({ partial_payments: updatedPayments, updated_at: new Date().toISOString() })
+        .eq("id", debtId);
+
+      if (error) throw error;
+
+      setDebts((prev) =>
+        prev.map((d) =>
+          d.id === debtId ? { ...d, partialPayments: updatedPayments } : d
+        )
+      );
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  return { debts, loading, error, addDebt, deleteDebt, addPartialPayment, deletePartialPayment, refresh: fetchDebts };
 }

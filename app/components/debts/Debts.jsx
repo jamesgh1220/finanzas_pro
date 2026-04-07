@@ -22,19 +22,25 @@ export default function DeudasSection() {
     description: "",
   });
 
-  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null, name: "" });
+  const [deleteConfirm, setDeleteConfirm] = useState({ 
+    open: false, 
+    id: null, 
+    type: null,
+    name: "",
+    debtId: null
+  });
 
   const openDialog = () => dialogRef.current?.showModal();
   const closeDialog = () => dialogRef.current?.close();
 
-  const { debts, addDebt, deleteDebt, addPartialPayment, loading } = useDebts();
+  const { debts, addDebt, deleteDebt, addPartialPayment, deletePartialPayment, loading } = useDebts();
 
   const [selectedDebtId, setSelectedDebtId] = useState(null);
   const selectedDebt = debts.find((d) => d.id === selectedDebtId);
 
   const minimumFee =
     form.totalMount && form.estimateMonths
-      ? Number(form.totalMount) / Number(form.estimateMonths)
+      ? Math.round(Number(form.totalMount) / Number(form.estimateMonths))
       : 0
 
   const handleAddDebt = async (e) => {
@@ -64,16 +70,17 @@ export default function DeudasSection() {
       minimumFractionDigits: 0,
     }).format(value);
 
-  const handleDelete = (id) => {
-    const debt = debts.find(d => d.id === id);
-    setDeleteConfirm({ open: true, id, name: debt?.name || "" });
+  const handleDelete = (id, type, name, debtId = null) => {
+    setDeleteConfirm({ open: true, id, type, name, debtId });
   }
 
   const confirmDelete = async () => {
-    if (deleteConfirm.id) {
+    if (deleteConfirm.type === 'debt') {
       await deleteDebt(deleteConfirm.id);
+    } else if (deleteConfirm.type === 'partialPayment' && deleteConfirm.debtId) {
+      await deletePartialPayment(deleteConfirm.debtId, deleteConfirm.id);
     }
-    setDeleteConfirm({ open: false, id: null, name: "" });
+    setDeleteConfirm({ open: false, id: null, type: null, name: "", debtId: null });
   };
 
   const openPartialPaymentDialog = (deuda) => {
@@ -279,10 +286,13 @@ export default function DeudasSection() {
 
       <ConfirmDialog
         isOpen={deleteConfirm.open}
-        onClose={() => setDeleteConfirm({ open: false, id: null, name: "" })}
+        onClose={() => setDeleteConfirm({ open: false, id: null, type: null, name: "", debtId: null })}
         onConfirm={confirmDelete}
-        title="Eliminar deuda"
-        message={`¿Estás seguro de que deseas eliminar la deuda "${deleteConfirm.name}"? Esta acción no se puede deshacer.`}
+        title={deleteConfirm.type === 'partialPayment' ? "Eliminar abono" : "Eliminar deuda"}
+        message={deleteConfirm.type === 'partialPayment' 
+          ? `¿Estás seguro de que deseas eliminar el abono de "${deleteConfirm.name}"?` 
+          : `¿Estás seguro de que deseas eliminar la deuda "${deleteConfirm.name}"? Esta acción no se puede deshacer.`
+        }
       />
     </section>
   )

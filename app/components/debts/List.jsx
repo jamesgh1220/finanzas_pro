@@ -1,6 +1,6 @@
 import { Plus, TrendingDown, Trash2, Calendar, DollarSign } from "lucide-react";
 
-export default function List({ debts, formatCurrency, handleDelete, openPartialPaymentDialog }) {
+export default function List({ debts, handleDelete, openPartialPaymentDialog, formatCurrency }) {
   const totalPaid = (debt) => debt.partialPayments.reduce((sum, partial) => sum + partial.mount, 0);
 
   return (
@@ -22,7 +22,7 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                 </h3>
 
                 <button
-                  onClick={() => handleDelete(debt.id)}
+                  onClick={() => handleDelete(debt.id, 'debt', debt.name)}
                   className="text-slate-400 cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
                 >
                   <Trash2 className="size-5" />
@@ -78,10 +78,32 @@ export default function List({ debts, formatCurrency, handleDelete, openPartialP
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-y-1 p-3 rounded-xl bg-secondary/50 mb-4">
-                  <p className="text-gray">Último abono</p>
-                  <p className="text-white! font-semibold">{formatCurrency(debt.partialPayments[debt.partialPayments.length - 1]?.mount ?? 0)}</p>
-                  <p className="text-gray">{debt.partialPayments[debt.partialPayments.length - 1]?.date ?? ''}</p>
+                <div className="space-y-2 text-sm text-zinc-300 mb-4">
+                  <span className="font-semibold text-base">Detalle de abonos</span>
+                  {debt.partialPayments?.length > 0 ? (
+                    debt.partialPayments.slice().reverse().map((payment) => (
+                      <div
+                        key={payment.id}
+                        className="flex justify-between bg-secondary/50 p-3 rounded-xl mt-1 items-center"
+                      >
+                        <div>
+                          <p className="font-semibold">${payment.mount.toLocaleString("es-CO")}</p>
+                          <p className="text-zinc-400 text-xs">{payment.date}</p>
+                          {payment.description && (
+                            <p className="text-sm text-zinc-400">{payment.description}</p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleDelete(payment.id, 'partialPayment', formatCurrency(payment.mount), debt.id)}
+                          className="text-gray cursor-pointer hover:text-red-500 transition-all duration-200 hover:scale-110"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-zinc-500 text-sm">No hay abonos registrados</p>
+                  )}
                 </div>
                 <button onClick={() => openPartialPaymentDialog(debt)} className="cursor-pointer font-medium flex justify-center items-center gap-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90">
                   <Plus className="h-4 w-4" />

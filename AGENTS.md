@@ -6,7 +6,7 @@
 - **UI:** React 19, Tailwind CSS 4
 - **Gráficos:** Recharts
 - **Íconos:** Lucide React
-- **Almacenamiento:** localStorage (pendiente migración a Supabase)
+- **Almacenamiento:** Supabase (PostgreSQL)
 
 ## Estructura del Proyecto
 ```
@@ -34,4 +34,8 @@ Ver: `docs/DATA_SCHEMAS.md`
 - IDs generados con `Date.now().toString()`
 
 ## Pendiente
-- Migrar almacenamiento de localStorage a Supabase (no implementado aún)
+- Ninguno (migración a Supabase completada)
+
+## Tablas de Supabase
+- `debts`: Gestión de deudas con abonos parciales
+- `incomes`: Gestión de ingresos mensuales con gastos
