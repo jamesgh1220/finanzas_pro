@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
-import { Eye, EyeOff, Wallet, ArrowRight, TrendingUp } from "lucide-react";
+import { Eye, EyeOff, Wallet, ArrowRight, TrendingUp, LayoutDashboard } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -30,45 +30,42 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-black to-zinc-900" />
-      <div className="absolute inset-0 opacity-40">
-        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-20 right-20 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px]" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-bg">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-10 right-10 w-[300px] h-[300px] bg-primary/8 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-10">
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="text-center mb-8">
           <div className="relative inline-flex mb-6">
-            <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-xl animate-pulse" />
-            <div className="relative flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-emerald-400 rounded-2xl shadow-lg shadow-primary/30">
-              <Wallet className="w-8 h-8 text-black" />
+            <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl" />
+            <div className="relative flex items-center justify-center w-14 h-14 bg-primary rounded-2xl shadow-lg shadow-primary/20">
+              <Wallet className="w-7 h-7 text-black" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2 font-[family-name:var(--font-display)]">FinanzasPro</h1>
-          <p className="text-zinc-500">Ingresa a tu cuenta para continuar</p>
+          <h1 className="text-2xl font-semibold text-fg mb-1" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>FinanzasPro</h1>
+          <p className="text-fg-muted text-sm">Ingresa a tu cuenta para continuar</p>
         </div>
 
-        <div className="relative p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-3xl" />
-          
-          <form onSubmit={handleSubmit} className="relative space-y-5">
+        <div className="p-6 rounded-2xl bg-bg-card border border-border shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
+              <label className="block text-xs font-medium text-fg-muted mb-1.5">
                 Correo electrónico
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
                 placeholder="tu@email.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
+              <label className="block text-xs font-medium text-fg-muted mb-1.5">
                 Contraseña
               </label>
               <div className="relative">
@@ -76,16 +73,16 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all pr-12"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm pr-10"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-muted hover:text-fg transition-colors cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -99,36 +96,40 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-primary to-emerald-400 hover:from-primary/90 hover:to-emerald-400 text-black font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30 hover:shadow-primary/50"
+              className="w-full py-2.5 px-4 bg-primary text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {loading ? (
-                <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
               ) : (
                 <>
                   Ingresar
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="relative mt-6 text-center">
-            <p className="text-zinc-500 text-sm">
+          <div className="mt-5 text-center">
+            <p className="text-fg-muted text-sm">
               ¿No tienes una cuenta?{" "}
-              <a href="/register" className="text-primary hover:text-emerald-400 font-medium transition-colors">
+              <a href="/register" className="text-primary hover:text-primary-light font-medium transition-colors">
                 Regístrate
               </a>
             </p>
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-6 text-zinc-600">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
+        <div className="mt-6 flex items-center justify-center gap-5 text-fg-subtle">
+          <div className="flex items-center gap-1.5">
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span className="text-xs">Dashboard</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5" />
             <span className="text-xs">Control total</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Wallet className="w-4 h-4" />
+          <div className="flex items-center gap-1.5">
+            <Wallet className="w-3.5 h-3.5" />
             <span className="text-xs">Seguimiento</span>
           </div>
         </div>

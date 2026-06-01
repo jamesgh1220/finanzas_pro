@@ -16,7 +16,7 @@ export default function Tabs({ activeTab, setActiveTab }) {
   useEffect(() => {
     const activeIndex = tabs.findIndex((t) => t.id === activeTab);
     const activeTabEl = tabsRef.current[activeIndex];
-    
+
     if (activeTabEl) {
       setIndicatorStyle({
         width: `${activeTabEl.offsetWidth}px`,
@@ -26,14 +26,14 @@ export default function Tabs({ activeTab, setActiveTab }) {
   }, [activeTab]);
 
   return (
-    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
       <div className="flex justify-center">
-        <div className="relative flex items-center gap-1 p-1.5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-xl">
+        <div className="relative flex items-center gap-1 p-1 rounded-xl bg-bg-elevated border border-border">
           <div
-            className="absolute top-1.5 h-[calc(100%-12px)] rounded-xl bg-gradient-to-r from-primary to-emerald-400 shadow-lg shadow-primary/25 transition-all duration-300 ease-out"
+            className="absolute top-1 h-[calc(100%-8px)] rounded-lg bg-bg-card shadow-sm border border-border transition-all duration-300 ease-out"
             style={indicatorStyle}
           />
-          
+
           {tabs.map((tab, index) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -44,14 +44,14 @@ export default function Tabs({ activeTab, setActiveTab }) {
                 ref={(el) => (tabsRef.current[index] = el)}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 z-10 cursor-pointer
-                  ${isActive 
-                    ? "text-black" 
-                    : "text-zinc-400 hover:text-zinc-200"
+                  relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 z-10 cursor-pointer
+                  ${isActive
+                    ? "text-fg"
+                    : "text-fg-muted hover:text-fg"
                   }
                 `}
               >
-                <Icon className={`relative w-4 h-4 ${isActive ? "text-black" : "text-zinc-400"}`} />
+                <Icon className={`relative w-4 h-4 ${isActive ? "text-primary" : "text-fg-muted"}`} />
                 <span className="relative">{tab.label}</span>
               </button>
             );

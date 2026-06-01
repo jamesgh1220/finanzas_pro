@@ -22,10 +22,10 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <p className="text-zinc-500 text-sm">Cargando...</p>
+          <div className="w-9 h-9 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-fg-muted text-sm">Cargando...</p>
         </div>
       </div>
     );
@@ -36,7 +36,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <Header />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <main>

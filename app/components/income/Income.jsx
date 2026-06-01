@@ -110,7 +110,7 @@ export default function Income() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-6">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-6 overflow-x-hidden">
       <HeaderIncomes openDialog={open} />
 
       {incomes.length > 0 && <GraphsHistory incomes={incomes} />}
@@ -122,28 +122,28 @@ export default function Income() {
       />
 
       {incomes.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 px-4 rounded-2xl bg-white/5 border border-white/5">
-          <div className="relative mb-4">
-            <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
-            <div className="relative p-4 rounded-full bg-white/10">
+        <div className="flex flex-col items-center justify-center py-16 px-4 rounded-2xl bg-bg-card border border-border animate-scale-in">
+          <div className="relative mb-5">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl" />
+            <div className="relative p-4 rounded-full bg-bg-elevated">
               <TrendingUp className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Sin ingresos registrados</h3>
-          <p className="text-zinc-500 text-center max-w-md mb-6">
+          <h3 className="text-xl font-semibold text-fg mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Sin ingresos registrados</h3>
+          <p className="text-fg-muted text-center max-w-md text-sm mb-6">
             Registra tu primer ingreso mensual para comenzar el control de tus finanzas.
           </p>
           <button
             onClick={open}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-emerald-400 text-black font-medium rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 cursor-pointer"
           >
             <Calculator className="h-4 w-4" />
-            Agregar Ingreso
+            Agregar ingreso
           </button>
         </div>
       )}
 
-      {/* Dialog Nuevo Mes */}
+      {/* Dialog Nuevo mes */}
       <dialog
         ref={newMonthRef}
         onClick={(e) => {
@@ -151,28 +151,28 @@ export default function Income() {
             newMonthRef.current.close();
           }
         }}
-        className="rounded-2xl p-0 bg-zinc-900 w-full max-w-md backdrop:bg-black/80 m-auto"
+        className="rounded-2xl p-0 bg-bg-card w-full max-w-md m-auto"
       >
-        <div className="relative p-6 border-b border-white/10">
+        <div className="relative p-5 border-b border-border">
           <button
             onClick={close}
-            className="absolute right-4 top-4 p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 cursor-pointer"
+            className="absolute right-4 top-4 p-2 text-fg-muted hover:text-fg transition-colors rounded-lg hover:bg-bg-hover cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
-          <h3 className="text-xl font-semibold text-white">Nuevo Ingreso</h3>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h3 className="text-lg font-semibold text-fg" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Nuevo ingreso</h3>
+          <p className="text-sm text-fg-muted mt-0.5">
             Crea un nuevo registro mensual
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-zinc-400 mb-2 block">Modo</label>
+              <label className="text-xs text-fg-muted mb-1.5 block font-medium">Modo</label>
               <select
                 value={mode}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
                 onChange={(e) => setMode(e.target.value)}
               >
                 <option value="mensual">Mensual</option>
@@ -180,11 +180,11 @@ export default function Income() {
               </select>
             </div>
             <div>
-              <label className="text-sm text-zinc-400 mb-2 block">Mes</label>
+              <label className="text-xs text-fg-muted mb-1.5 block font-medium">Mes</label>
               <select
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               >
                 {enabledMonths.map((m) => (
                   <option key={m} value={m}>
@@ -195,13 +195,13 @@ export default function Income() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-zinc-400 mb-2 block">Año</label>
+              <label className="text-xs text-fg-muted mb-1.5 block font-medium">Año</label>
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               >
                 {years.map((y) => (
                   <option key={y} value={y}>
@@ -211,13 +211,13 @@ export default function Income() {
               </select>
             </div>
             <div>
-              <label className="text-sm text-zinc-400 mb-2 block">Ingreso total</label>
+              <label className="text-xs text-fg-muted mb-1.5 block font-medium">Ingreso total</label>
               <input
                 type="number"
                 placeholder="5000000"
                 value={totalIncomes}
                 onChange={(e) => setIngresoTotal(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
                 required
               />
             </div>
@@ -229,24 +229,24 @@ export default function Income() {
                 <Calculator className="h-4 w-4" />
                 <span className="text-sm font-medium">Ingreso registrado</span>
               </div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-xl font-bold text-fg stat-value">
                 {Number(totalIncomes).toLocaleString("es-CO")}
               </p>
-              <p className="text-xs text-zinc-500 mt-1">{month} {year}</p>
+              <p className="text-xs text-fg-muted mt-0.5">{month} {year}</p>
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <button
               type="button"
               onClick={close}
-              className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-medium cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-border text-fg-muted flex items-center justify-center hover:text-fg hover:bg-bg-hover transition-colors font-medium text-sm cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-emerald-400 text-black font-medium hover:shadow-lg hover:shadow-primary/25 transition-all cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white flex items-center justify-center font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all text-sm cursor-pointer"
             >
               Crear
             </button>
@@ -254,7 +254,7 @@ export default function Income() {
         </form>
       </dialog>
 
-      {/* Dialog Agregar Gasto */}
+      {/* Dialog Agregar gasto */}
       <dialog
         ref={addGastoRef}
         onClick={(e) => {
@@ -262,28 +262,28 @@ export default function Income() {
             closeAddGastoDialog();
           }
         }}
-        className="rounded-2xl p-0 bg-zinc-900 w-full max-w-md backdrop:bg-black/80 m-auto"
+        className="rounded-2xl p-0 bg-bg-card w-full max-w-md m-auto"
       >
-        <div className="relative p-6 border-b border-white/10">
+        <div className="relative p-5 border-b border-border">
           <button
             onClick={closeAddGastoDialog}
-            className="absolute right-4 top-4 p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 cursor-pointer"
+            className="absolute right-4 top-4 p-2 text-fg-muted hover:text-fg transition-colors rounded-lg hover:bg-bg-hover cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
-          <h3 className="text-xl font-semibold text-white">Agregar Gasto</h3>
-          <p className="text-sm text-zinc-500 mt-1">
-            Para: <span className="text-primary">{selectedIncome?.month} {selectedIncome?.year}</span>
+          <h3 className="text-lg font-semibold text-fg" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Agregar gasto</h3>
+          <p className="text-sm text-fg-muted mt-0.5">
+            Para: <span className="text-primary font-medium">{selectedIncome?.month} {selectedIncome?.year}</span>
           </p>
         </div>
 
-        <form onSubmit={handleAddExpense} className="p-6 space-y-5">
+        <form onSubmit={handleAddExpense} className="p-5 space-y-4">
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Categoría</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Categoría</label>
             <select
               value={expenseForm.categorie}
               onChange={(e) => setExpenseForm({ ...expenseForm, categorie: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               required
             >
               <option value="">Selecciona una categoría</option>
@@ -296,50 +296,50 @@ export default function Income() {
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Monto</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Monto</label>
             <input
               type="number"
               value={expenseForm.mount}
               onChange={(e) => setExpenseForm({ ...expenseForm, mount: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               placeholder="150000"
               required
             />
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Fecha</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Fecha</label>
             <input
               type="date"
               value={expenseForm.date}
               onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Descripción (opcional)</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Descripción (opcional)</label>
             <textarea
               rows="3"
               value={expenseForm.description}
               onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none text-sm"
               placeholder="Detalles adicionales..."
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <button
               type="button"
               onClick={closeAddGastoDialog}
-              className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-medium cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-border text-fg-muted flex items-center justify-center hover:text-fg hover:bg-bg-hover transition-colors font-medium text-sm cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-emerald-400 text-black font-medium hover:shadow-lg hover:shadow-primary/25 transition-all cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white flex items-center justify-center font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all text-sm cursor-pointer"
             >
               Agregar
             </button>

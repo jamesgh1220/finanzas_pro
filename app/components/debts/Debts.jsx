@@ -116,7 +116,7 @@ export default function DeudasSection() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-6">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-6 overflow-x-hidden">
       <HeaderDebts
         debts={debts}
         formatCurrency={formatCurrency}
@@ -135,28 +135,28 @@ export default function DeudasSection() {
       />
 
       {debts.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 px-4 rounded-2xl bg-white/5 border border-white/5">
-          <div className="relative mb-4">
-            <div className="absolute inset-0 bg-danger/20 rounded-full blur-2xl" />
-            <div className="relative p-4 rounded-full bg-white/10">
+        <div className="flex flex-col items-center justify-center py-16 px-4 rounded-2xl bg-bg-card border border-border animate-scale-in">
+          <div className="relative mb-5">
+            <div className="absolute inset-0 bg-danger/20 rounded-full blur-3xl" />
+            <div className="relative p-4 rounded-full bg-bg-elevated">
               <Calculator className="h-8 w-8 text-danger" />
             </div>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Sin deudas registradas</h3>
-          <p className="text-zinc-500 text-center max-w-md mb-6">
+          <h3 className="text-xl font-semibold text-fg mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Sin deudas registradas</h3>
+          <p className="text-fg-muted text-center max-w-md text-sm mb-6">
             Agrega tu primera deuda para comenzar a hacer seguimiento de tus pagos.
           </p>
           <button
             onClick={openDialog}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-emerald-400 text-black font-medium rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 cursor-pointer"
           >
             <Calculator className="h-4 w-4" />
-            Agregar Deuda
+            Agregar deuda
           </button>
         </div>
       )}
 
-      {/* Dialog Nueva Deuda */}
+      {/* Dialog Nueva deuda */}
       <dialog
         ref={dialogRef}
         onClick={(e) => {
@@ -164,26 +164,26 @@ export default function DeudasSection() {
             dialogRef.current.close();
           }
         }}
-        className="rounded-2xl p-0 bg-zinc-900 w-full max-w-md backdrop:bg-black/80 m-auto"
+        className="rounded-2xl p-0 bg-bg-card w-full max-w-md m-auto"
       >
-        <div className="relative p-6 border-b border-white/10">
+        <div className="relative p-5 border-b border-border">
           <button
             onClick={closeDialog}
-            className="absolute right-4 top-4 p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 cursor-pointer"
+            className="absolute right-4 top-4 p-2 text-fg-muted hover:text-fg transition-colors rounded-lg hover:bg-bg-hover cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
-          <h3 className="text-xl font-semibold text-white">Nueva Deuda</h3>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h3 className="text-lg font-semibold text-fg" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Nueva deuda</h3>
+          <p className="text-sm text-fg-muted mt-0.5">
             Registra una nueva deuda para hacer seguimiento
           </p>
         </div>
 
-        <form onSubmit={handleAddDebt} className="p-6 space-y-5">
+        <form onSubmit={handleAddDebt} className="p-5 space-y-4">
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Nombre de la deuda</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Nombre de la deuda</label>
             <input
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Ej: Crédito educativo"
@@ -192,10 +192,10 @@ export default function DeudasSection() {
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Monto total</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Monto total</label>
             <input
               type="number"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               value={form.totalMount}
               onChange={(e) => setForm({ ...form, totalMount: e.target.value })}
               placeholder="5000000"
@@ -204,10 +204,10 @@ export default function DeudasSection() {
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Tiempo estimado (meses)</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Tiempo estimado (meses)</label>
             <input
               type="number"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               value={form.estimateMonths}
               onChange={(e) => setForm({ ...form, estimateMonths: e.target.value })}
               placeholder="12"
@@ -221,22 +221,22 @@ export default function DeudasSection() {
                 <Calculator className="h-4 w-4" />
                 <span className="text-sm font-medium">Cuota mínima calculada</span>
               </div>
-              <p className="text-2xl font-bold text-white">{formatCurrency(minimumFee)}</p>
-              <p className="text-xs text-zinc-500 mt-1">por mes</p>
+              <p className="text-xl font-bold text-fg stat-value">{formatCurrency(minimumFee)}</p>
+              <p className="text-xs text-fg-muted mt-0.5">por mes</p>
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <button
               type="button"
               onClick={closeDialog}
-              className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-medium cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-border text-fg-muted flex items-center justify-center hover:text-fg hover:bg-bg-hover transition-colors font-medium text-sm cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-emerald-400 text-black font-medium hover:shadow-lg hover:shadow-primary/25 transition-all cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white flex items-center justify-center font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all text-sm cursor-pointer"
             >
               Crear Deuda
             </button>
@@ -247,32 +247,32 @@ export default function DeudasSection() {
       {/* Dialog Abono */}
       <dialog
         ref={partialPaymentDialogRef}
-        className="rounded-2xl p-0 bg-zinc-900 w-full max-w-md backdrop:bg-black/80 m-auto"
+        className="rounded-2xl p-0 bg-bg-card w-full max-w-md m-auto"
         onClick={(e) => {
           if (e.target === partialPaymentDialogRef.current) {
             closePartialPaymentDialog();
           }
         }}
       >
-        <div className="relative p-6 border-b border-white/10">
+        <div className="relative p-5 border-b border-border">
           <button
             onClick={closePartialPaymentDialog}
-            className="absolute right-4 top-4 p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 cursor-pointer"
+            className="absolute right-4 top-4 p-2 text-fg-muted hover:text-fg transition-colors rounded-lg hover:bg-bg-hover cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
-          <h3 className="text-xl font-semibold text-white">Agregar Abono</h3>
-          <p className="text-sm text-zinc-500 mt-1">
-            Registra un pago para: <span className="text-primary">{selectedDebt?.name}</span>
+          <h3 className="text-lg font-semibold text-fg" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Agregar abono</h3>
+          <p className="text-sm text-fg-muted mt-0.5">
+            Para: <span className="text-primary font-medium">{selectedDebt?.name}</span>
           </p>
         </div>
 
-        <form onSubmit={handleAddPartialPayment} className="p-6 space-y-5">
+        <form onSubmit={handleAddPartialPayment} className="p-5 space-y-4">
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Monto del abono</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Monto del abono</label>
             <input
               type="number"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               value={partialPaymentForm.mount}
               onChange={(e) =>
                 setPartialPaymentForm({ ...partialPaymentForm, mount: e.target.value })
@@ -283,10 +283,10 @@ export default function DeudasSection() {
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Fecha del pago</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Fecha del pago</label>
             <input
               type="date"
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
               value={partialPaymentForm.date}
               onChange={(e) =>
                 setPartialPaymentForm({ ...partialPaymentForm, date: e.target.value })
@@ -296,10 +296,10 @@ export default function DeudasSection() {
           </div>
 
           <div>
-            <label className="text-sm text-zinc-400 mb-2 block">Descripción (opcional)</label>
+            <label className="text-xs text-fg-muted mb-1.5 block font-medium">Descripción (opcional)</label>
             <textarea
               rows={3}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-bg-elevated border border-border text-fg placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none text-sm"
               value={partialPaymentForm.description}
               onChange={(e) =>
                 setPartialPaymentForm({ ...partialPaymentForm, description: e.target.value })
@@ -308,17 +308,17 @@ export default function DeudasSection() {
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <button
               type="button"
               onClick={closePartialPaymentDialog}
-              className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-medium cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-border text-fg-muted flex items-center justify-center hover:text-fg hover:bg-bg-hover transition-colors font-medium text-sm cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-emerald-400 text-black font-medium hover:shadow-lg hover:shadow-primary/25 transition-all cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white flex items-center justify-center font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all text-sm cursor-pointer"
             >
               Agregar
             </button>
